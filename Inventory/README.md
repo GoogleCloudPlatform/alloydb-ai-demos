@@ -26,9 +26,9 @@ project-root/
 │
 ├─ ingestion/
 |  ├─ embeddings/                  # Batch/stream pipelines (Python)
-│  ├─ embed_docs_vertex.py    
-│  ├─ embed_rag_docs.py   
-│  ├─ embed_products_vertex.py        # Vertex AI text embeddings → product_vectors
+│      ├─ embed_docs_vertex.py    
+│      ├─ embed_rag_docs.py   
+│      ├─ embed_products_vertex.py        # Vertex AI text embeddings → product_vectors
 │  
 │
 ├─ backend/                    # FastAPI (Python)
@@ -72,7 +72,7 @@ script/
 - PostgreSQL (AlloyDB **or** Cloud SQL Postgres) + `pgvector` store facts, forecasts & vectors
 - Server-side embeddings using Vertex AI text-embeddings for product similarity & substitutions
 - (Optional) Vertex AI forecasting (Demand) + rules-based or service-level policies for reorder
-- Notifications via email/Slack/Pub/Sub; files to GCS (PO exports, reports)
+
 
 **Core tables** (schema example)
 ```
@@ -235,18 +235,15 @@ export class InventoryApiService {
 **Ingest master & transactions**
 ```bash
 cd ingestion
-python ingest_master_data.py --schema inventory_app --files ./data/master/
-python ingest_transactions.py --schema inventory_app --files ./data/transactions/
+python load_online_retail.py --schema inventory_app --files ./data
+python run_single_pass.py --schema 
 ```
 **Compute product embeddings** (substitution & similarity search)
 ```bash
-python embed_products.py --schema inventory_app --model textembedding-gecko@003 --embed-dim 768
+python embed_products_vertex.py --schema inventory_app --model textembedding --embed-dim 768
+python embed_docs_vertex.py --schema inventory_app --model textembedding --embed-dim 768
+python generate_rag_docs.py --schema inventory_app --model textembedding --embed-dim 768
 ```
-**Forecast demand**
-```bash
-python compute_demand.py --schema inventory_app --horizon-days 14 --method vertex
-```
-> If you maintain `daily_demand`, the backend can reuse forecasts for planning.
 
 ---
 
@@ -315,4 +312,5 @@ Host the build (Cloud Storage + CDN, Firebase Hosting, or NGINX). Set `environme
 
 ---
 
-© Your Company — Intelligent Inventory Replenishment
+
+

@@ -1,0 +1,275 @@
+<header class="header">
+  <div class="header__logo">
+    <img src="/assets/images/New_logo.svg" alt="logo" (click)="refresh()" style="cursor:pointer;"
+      title="Click to Go HomePage" />
+  </div>
+
+  <div class="icon-row" style="justify-content: flex-end;color:#6750A4;width: 20px;height:20px;">
+    <span class="material-icons" aria-hidden="true" style="cursor:pointer;" (click)="openDoc()"
+      title="User Guide">help_outline</span>
+  </div>
+</header>
+
+<div class="container">
+  <section class="hero">
+    <h2 class="hero__title">
+      The Fashion Company for You<br />
+      From Everyday Essentials to Luxury Indulgences
+    </h2>
+
+    <form class="search-bar" (submit)="$event.preventDefault(); onSearch()">
+      <input #searchInput type="text" [(ngModel)]="query" name="search"
+        placeholder="Search for your next fashion highlight" aria-label="Search input"
+        (input)="validationMessage = ''; onSearchInput()" />
+      <button type="button" class="search-bar__icon" aria-label="Search" (click)="onSearch()"
+        [attr.aria-busy]="loading">
+        <ng-container *ngIf="!loading; else spinner">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        </ng-container>
+        <ng-template #spinner>
+          <!-- <span class="btn-spinner" aria-hidden="true"></span> -->
+        </ng-template>
+      </button>
+    </form>
+
+    <div class="filters" role="toolbar" aria-label="Search filters">
+      <div class="filters__group filters__left" role="group" aria-label="Search modes"></div>
+
+      <div class="filters__group filters__right">
+        <div class="dropdown">
+          <select [(ngModel)]="selectedCategory" (change)="onCategoryChange($any($event.target).value)">
+            <option value="">All Categories</option>
+            <option *ngFor="let c of categories" [value]="c">{{ c }}</option>
+          </select>
+          <span class="dropdown__arrow">▾</span>
+        </div>
+
+        <div class="dropdown">
+          <select [(ngModel)]="selectedBrand" (change)="onBrandChange($any($event.target).value)">
+            <option value="">All Brands</option>
+            <option *ngFor="let b of brands" [value]="b">{{ b }}</option>
+          </select>
+          <span class="dropdown__arrow">▾</span>
+        </div>
+
+        <div class="dropdown">
+          <button class="filter" type="button" (click)="openPricePopup()" aria-haspopup="dialog"
+            [attr.aria-expanded]="pricePopupOpen">
+            Price
+          </button>
+        </div>
+
+        <div class="dropdown">
+          <select [(ngModel)]="selectedRating" (change)="onRatingChange($any($event.target).value)">
+            <option [value]="0">Rating</option>
+            <option [value]="5">5 stars</option>
+            <option [value]="4">4 stars & up</option>
+            <option [value]="3">3 stars & up</option>
+            <option [value]="2">2 stars & up</option>
+            <option [value]="1">1 star & up</option>
+          </select>
+          <span class="dropdown__arrow">▾</span>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="validationMessage" class="validation-message" role="alert" aria-live="assertive">
+      {{ validationMessage }}
+    </div>
+
+    <div *ngIf="filterMessage" class="validation-message" role="status" aria-live="polite">
+      {{ filterMessage }}
+    </div>
+
+    <div class="suggestions" aria-label="Search suggestions">
+      <div class="suggestions__list">
+        <button class="suggestion-card" *ngFor="let s of suggestions" (click)="applySuggestion(s)"
+          [attr.aria-label]="'Suggestion: ' + s">
+          {{ s }}
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="searchResultsVisible" class="search-results-header left" [class.disabled]="total === 0" role="region"
+      aria-live="polite">
+      <div class="search-results-left">
+        <h3 class="search-results-title">{{ infoModalMode || 'Search results' }}</h3>
+
+        <a href="#" (click)="onViewQuery($event)" class="search-results-link" [attr.aria-disabled]="total === 0"
+          [attr.tabindex]="total === 0 ? -1 : 0">
+          View query
+        </a>
+
+        <span class="search-results-count"> Showing {{ getDisplayStart() }} - {{ getDisplayEnd() }} of {{ newTotal }}</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Product grid -->
+  <section class="product-grid" role="list" *ngIf="!loading && displayed.length">
+    <article class="product-card" *ngFor="let product of displayed" role="listitem"
+      [attr.aria-label]="product.productDisplayName">
+      <div class="product-card__image" role="img" [attr.aria-label]="product.productDisplayName">
+        <img [src]="$any(product).link || '/assets/images/placeholder.png'"
+          [alt]="product.productDisplayName || 'Product image'" loading="lazy" />
+      </div>
+
+      <h3 class="product-card__title" title="{{ product.productDisplayName }}">
+        {{ product.productDisplayName }}
+      </h3>
+
+      <div class="product-card__meta">
+        <div class="product-card__rating" aria-label="Rating">
+          <span class="stars" aria-hidden="true">
+            <i class="fa-solid fa-star" *ngFor="let _ of createRange(product.roundedRate)"></i>
+            <i class="fa-regular fa-star" *ngFor="let _ of emptyStars(product.roundedRate)"></i>
+          </span>
+          <span class="reviews" aria-live="polite">{{ product.rating }}</span>
+        </div>
+      </div>
+
+      <div class="product-card__price" aria-label="Price">
+        <div class="price-left">
+          <span class="price__current">{{ product.finalPrice | currency:'USD':'symbol' }}</span>
+
+          <span *ngIf="($any(product).unitPrice ?? 0) > (product.finalPrice ?? 0)" class="price__meta">
+            <span class="price__original" aria-hidden="true">{{ $any(product).unitPrice | currency:'USD':'symbol'
+              }}</span>
+          </span>
+        </div>
+
+        <div class="price-right" *ngIf="($any(product).discountPercent ?? 0) > 0" aria-hidden="true">
+          <span class="discount-badge">-{{ $any(product).discountPercent ?? 0 }}%</span>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- No-results message -->
+<div *ngIf="error && !loading" class="no-results-message" role="status" aria-live="polite"> {{ error }} </div> <div *ngIf="!error && !displayed.length && !loading" class="no-results-message" role="status" aria-live="polite"> No products match your current filters. Try adjusting the brand or category, or widening the price range, then click Search. </div>
+
+
+
+  <!-- Loading overlay -->
+  <div *ngIf="loading" class="global-loader" aria-hidden="true">
+    <div class="loader-overlay"></div>
+    <div class="loader-center">
+      <div class="spinner"></div>
+      <div class="loader-text">Loading..</div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && !products?.length" style="text-align:center; padding:24px;">No products found.</div>
+  <!-- <div *ngIf="error" style="color:#c00; text-align:center; padding:12px">{{ error }}</div> -->
+
+  <!-- Price Popup Modal using ngx-slider -->
+  <div class="price-popup-backdrop" *ngIf="pricePopupOpen" role="dialog" aria-modal="true" tabindex="-1">
+    <div class="price-popup image-style" role="document" tabindex="0" aria-label="Price range dialog">
+      <header class="price-popup__header">
+        <label class="range-value">Price Range</label>
+        <div class="price-popup__actions">
+          <button class="icon-btn" title="Apply" (click)="closePricePopup(true)" aria-label="Apply price">
+            <i class="fa-solid fa-check" aria-hidden="true"></i>
+          </button>
+          <button class="icon-btn" title="Close" (click)="closePricePopup(false)" aria-label="Close price dialog">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+          </button>
+        </div>
+      </header>
+
+      <div class="price-popup__body">
+        <div class="dual-range-wrap image-like">
+          <div class="range-visual">
+            <div class="range-visual-track" role="presentation">
+              <ngx-slider [(value)]="tempMin" [(highValue)]="tempMax" [options]="sliderOptions"
+                aria-label="Price range slider"></ngx-slider>
+            </div>
+          </div>
+
+          <div class="range-values image-inputs">
+            <div class="range-value">
+              <label>Min Value</label>
+              <div class="value-input-wrap">
+                <span class="currency-prefix">$</span>
+                <input class="value-input" type="number" [min]="priceLimitMin" [max]="priceLimitMax"
+                  [(ngModel)]="tempMin" (input)="onMinInputChange($any($event.target).valueAsNumber)" />
+              </div>
+            </div>
+
+            <div class="range-value">
+              <label>Max Value</label>
+              <div class="value-input-wrap">
+                <span class="currency-prefix">$</span>
+                <input class="value-input" type="number" [min]="priceLimitMin" [max]="priceLimitMax"
+                  [(ngModel)]="tempMax" (input)="onMaxInputChange($any($event.target).valueAsNumber)" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Modal -->
+  <div class="info-modal-backdrop" *ngIf="infoModalOpen" role="dialog" aria-modal="true"
+    aria-labelledby="infoModalTitle" (keydown.escape)="closeInfoModal()" tabindex="-1">
+    <div class="info-modal" role="document" aria-describedby="infoModalSql" tabindex="0">
+      <header class="info-modal__header">
+        <div class="info-modal__title" id="infoModalTitle">
+          <span class="info-modal-title" *ngIf="infoModalMode">{{ infoModalMode }}</span>
+          <div class="info-modal__subtitle" *ngIf="infoModalSubtitle">{{ infoModalSubtitle }}</div>
+        </div>
+
+        <div class="info-modal__actions" aria-hidden="false">
+          <button class="icon-btn" title="Download SQL" (click)="downloadSql()" aria-label="Download SQL">
+            <i class="fa-solid fa-download" aria-hidden="true"></i>
+          </button>
+
+          <button class="icon-btn" title="Copy SQL" (click)="copySql()" aria-label="Copy SQL">
+            <i class="fa-solid fa-copy" aria-hidden="true"></i>
+          </button>
+
+          <button class="icon-btn" title="Close" (click)="closeInfoModal()" aria-label="Close dialog">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+          </button>
+        </div>
+      </header>
+
+      <div class="info-modal__body">
+        <pre id="infoModalSql" class="info-modal__sql" aria-live="polite">{{ infoModalSql }}</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Place paginator at the end of the container (not fixed) -->
+  <div *ngIf="useNewPagination && !loading && newTotal > 0" class="new-paginator" role="navigation" aria-label="Product pagination">
+    <div class="new-paginator__left">
+      <button class="filter" type="button" (click)="newGoToPage(1)" [disabled]="newPage === 1" aria-label="First page">« First</button>
+      <button class="filter" type="button" (click)="newPrev()" [disabled]="newPage === 1" aria-label="Previous page">‹ Prev</button>
+    </div>
+
+    <div class="new-paginator__pages" aria-hidden="false">
+      <button class="filter" *ngFor="let p of newPages" type="button" [class.active]="p === newPage" (click)="newGoToPage(p)" [attr.aria-current]="p === newPage ? 'page' : null">
+        {{ p }}
+      </button>
+    </div>
+
+    <div class="new-paginator__right">
+      <button class="filter" type="button" (click)="newNext()" [disabled]="newPage === newTotalPages" aria-label="Next page">Next ›</button>
+      <button class="filter" type="button" (click)="newGoToPage(newTotalPages)" [disabled]="newPage === newTotalPages" aria-label="Last page">Last »</button>
+
+      <label style="margin-left:12px; display:inline-flex; align-items:center; gap:8px;">
+        <span style="font-size:0.9rem; color:#49454F;">Per page</span>
+        <select [(ngModel)]="newPerPage" (change)="newChangePerPage($any($event.target).value)" class="dropdown-select">
+          <option *ngFor="let opt of newPerPageOptions" [value]="opt">{{ opt }}</option>
+        </select>
+      </label>
+
+      <span style="margin-left:12px; color:#49454F; font-size:0.95rem;">
+        Showing {{ getDisplayStart() }} - {{ getDisplayEnd() }} of {{ newTotal }}
+      </span>
+    </div>
+  </div>
+</div>
+
+<app-chatbot></app-chatbot>
