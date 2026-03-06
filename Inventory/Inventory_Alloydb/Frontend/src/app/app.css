@@ -1,0 +1,46 @@
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 1000;
+  background: #ffffff;
+  box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.05);
+  z-index: 1000;
+}
+
+.header-left,
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.app-logo {
+  cursor:pointer;
+  display: flex;
+  padding: 18px 32px 16px 32px;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--Schemes-On-Primary, #FFF);
+  height: 32px;
+  width: auto;
+}
+
+.user-guide-btn {
+   background : none;
+   border: none;
+   cursor: pointer;
+   padding: 20px;
+   display: flex;
+   align-items: center;
+}
+
+.user-guide-btn .material-icons {
+  color: #6750A4;
+}
+
+

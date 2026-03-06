@@ -1,0 +1,311 @@
+<!-- inventory-dashboard.html -->
+<div class="dashboard">
+
+  <main class="content">
+    <header class="page-header">
+      <h2 class="dashboard-title">Inventory Overview</h2>
+    </header>
+
+    <!-- KPI cards -->
+    <!-- KPI cards -->
+    <section  class="kpi-cards" aria-label="Key metrics">
+      <div *ngIf="isKpiCardsLoading" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <div class="loading-text">Loading KPI metrics...</div>
+      </div>
+
+      <ng-container *ngIf="!isKpiCardsLoading">
+        <mat-card class="total-skus-items" (click)="onTotalSkusClick()">
+          <div class="kpi-title">Total Stock Keeping Units</div>
+          <div class="kpi-value">{{ totalSkus }}</div>
+        </mat-card>
+
+        <mat-card class="low-stock-items" (click)="onCardClick('Low Stock Items')"
+          [class.active-card]="activeCard === 'Low Stock Items'">
+          <div class="kpi-title">Low Stock Items</div>
+          <div class="kpi-value">{{ lowStock }}</div>
+        </mat-card>
+
+        <mat-card class="over-stock-items" (click)="onCardClick('Over Stock Items')"
+          [class.active-card]="activeCard === 'Over Stock Items'">
+          <div class="kpi-title">Over Stock Items</div>
+          <div class="kpi-value">{{ overStock }}</div>
+        </mat-card>
+
+        <mat-card class="critical-items" (click)="onCardClick('Critical Stock Items')"
+          [class.active-card]="activeCard === 'Critical Stock Items'">
+          <div class="kpi-title">Critical Stock Items</div>
+          <div class="kpi-value">{{ critical }}</div>
+        </mat-card>
+      </ng-container>
+    </section>
+
+
+    <!-- Tabs table (Low / Over / Critical) -->
+    <section *ngIf="activeCard" class="table-section">
+      <p class="card-table-title">{{ currentTabName }}</p>
+
+      <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner mode="indeterminate" diameter="40"></mat-spinner>
+        <div class="loading-text">Loading {{ currentTabName }}...</div>
+      </div>
+
+      <div *ngIf="!isLoading && tabsDataSource.data.length === 0" class="no-data">
+        <p>No {{ currentTabName }} available.</p>
+      </div>
+
+      <div class="table-scroll-wrapper" *ngIf="!isLoading && tabsDataSource.data.length > 0">
+        <table mat-table [dataSource]="tabsDataSource" class="mat-elevation-z2 tab-table-design full-width-table">
+
+          <ng-container matColumnDef="image">
+            <th class="table-header" mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let e">
+              <img [src]="e.image" class="imgClass" />
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="product">
+            <th class="table-header" mat-header-cell *matHeaderCellDef>Product</th>
+            <td mat-cell *matCellDef="let item">{{ item.product_name }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="sku">
+            <th class="table-header" mat-header-cell *matHeaderCellDef>SKU</th>
+            <td mat-cell *matCellDef="let item">{{ item.sku }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="location">
+            <th class="table-header" mat-header-cell *matHeaderCellDef>Location</th>
+            <td mat-cell *matCellDef="let item">{{ item.location }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="onHand">
+            <th class="table-header" mat-header-cell *matHeaderCellDef>On Hand</th>
+            <td mat-cell *matCellDef="let item">{{ item.on_hand }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="inTransit">
+            <th class="table-header" mat-header-cell *matHeaderCellDef>In Transit</th>
+            <td mat-cell *matCellDef="let item">{{ item.in_transit }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="safetyStock">
+            <th class="table-header" mat-header-cell *matHeaderCellDef>Safety Stock</th>
+            <td mat-cell *matCellDef="let item">{{ item.safety_stock }}</td>
+          </ng-container>
+
+          <!-- Actions column: show Replenish only for Low and Critical tabs -->
+          <ng-container matColumnDef="actions">
+            <th class="table-header" mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let item">
+              <button class="replenish-button"
+                *ngIf="currentTabName === 'Low Stock Items' || currentTabName === 'Critical Stock Items'"
+                (click)="openReplenishDialog(item, replenishDialog)">
+                Replenish
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedTabsColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedTabsColumns"></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- All SKU inventory details (hidden when a KPI tab is active) -->
+    <section class="table-title-button" *ngIf="!activeCard">
+      <h4 class="table-title">All SKU Inventory Details</h4>
+      <div>
+        <button class="add-new-product-button" mat-button (click)="openAddProductDialog()">Add New Product</button>
+      </div>
+    </section>
+
+    <!-- Loader for All SKU inventory -->
+    <section class="table-design" *ngIf="!activeCard">
+      <div *ngIf="loading" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <div class="loading-text">Loading All SKU inventory details...</div>
+      </div>
+
+      <div *ngIf="!loading && datasource.data.length > 0" class="table-scroll-wrapper">
+        <table mat-table [dataSource]="datasource" class="mat-elevation-z8 full-width-table">
+
+          <ng-container matColumnDef="image">
+            <th class="table-header" mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let e">
+              <img [src]="e.image" class="imgClass" />
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="name">
+            <th class="table-header" mat-header-cell *matHeaderCellDef>Product name</th>
+            <td mat-cell *matCellDef="let e">{{ e.product_name }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="sku">
+            <th class="table-header" mat-header-cell *matHeaderCellDef>Sku</th>
+            <td mat-cell *matCellDef="let e">{{ e.sku }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="location">
+            <th class="table-header" mat-header-cell *matHeaderCellDef>Location</th>
+            <td mat-cell *matCellDef="let e">{{ e.location }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="on_hand">
+            <th class="table-header" mat-header-cell *matHeaderCellDef>On Hand</th>
+            <td mat-cell *matCellDef="let e">{{ e.on_hand }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="in_transit">
+            <th class="table-header" mat-header-cell *matHeaderCellDef>In Transit</th>
+            <td mat-cell *matCellDef="let e">{{ e.in_transit }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="safety_stock">
+            <th class="table-header" mat-header-cell *matHeaderCellDef>Safety Stock</th>
+            <td mat-cell *matCellDef="let e">{{ e.safety_stock }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="reorder_point">
+            <th class="table-header" mat-header-cell *matHeaderCellDef>Reorder Point</th>
+            <td mat-cell *matCellDef="let e">{{ e.reorder_point }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th class="table-header" mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let e">{{ e.status }}</td>
+          </ng-container>
+
+          <!-- Note: no Replenish button in All SKU table -->
+          <ng-container matColumnDef="actions">
+            <th class="table-header" mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let product; let i=index">
+              <button matTooltip="Edit product" class="edit-button" (click)="openAddEditProductDialog(product)">
+                Edit
+              </button>
+
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedPOColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedPOColumns"></tr>
+        </table>
+
+        <div class="no-data-container" *ngIf="!loading && datasource.data.length === 0">
+          <mat-icon>info</mat-icon>
+          No data available to display!
+        </div>
+      </div>
+    </section>
+
+    <!-- Charts section (hidden when a KPI tab is active) -->
+    <section class="charts">
+      <div class="status-distribution" #doughnutContainer>
+        <h4 class="chart-title">Inventory Status Distribution</h4>
+
+        <!-- spinner overlay for donut -->
+        <div class="chart-box">
+          <div class="chart-overlay" *ngIf="isDonutChartLoading">
+            <mat-spinner diameter="36"></mat-spinner>
+          </div>
+          <canvas #doughnutCanvas></canvas>
+        </div>
+      </div>
+
+      <div class="status-distribution">
+        <h4 class="chart-title">Inventory by Location</h4>
+        <div class="chart-box">
+          <div class="chart-overlay" *ngIf="isBarChartLoading">
+            <mat-spinner diameter="36"></mat-spinner>
+          </div>
+          <canvas #barCanvas></canvas>
+        </div>
+      </div>
+    </section>
+
+    <ng-template #replenishDialog>
+      <div class="replenish-dialog-table" *ngIf="currentDialogData">
+        <div class="dialog-header">
+          <h2 class="replenish_title">Resolve Alert </h2>
+          <button mat-icon-button (click)="closeDialog()"><mat-icon>close</mat-icon></button>
+        </div>
+
+        <div class="dialog-table-wrapper">
+          <table class="dialog-table">
+            <thead class="table-header-replenish" mat-header-cell>
+              <tr>
+                <th>Product</th>
+                <th>SKU</th>
+                <th>Location</th>
+                <th>On Hand</th>
+                <th>In Transit</th>
+                <th>Safety Stock</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <!-- Product cell: image + name -->
+                <td class="product-cell">
+                  <div class="product-inline">
+                    <img [src]="currentDialogData.image" alt="{{ currentDialogData.product_name }}" />
+                    <div>
+                      <div class="product-name">{{ currentDialogData.product_name || currentDialogData.name }}</div>
+                      <div class="meta" *ngIf="currentDialogData.category">Category: {{ currentDialogData.category }}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- SKU -->
+                <td>
+                  <span class="readonly-value">{{ currentDialogData.sku }}</span>
+                </td>
+
+                <!-- Location -->
+                <td>
+                  <span class="readonly-value">{{ currentDialogData.location || '-' }}</span>
+                </td>
+
+                <!-- On Hand -->
+                <td>
+                  <span class="readonly-value">{{ currentDialogData.on_hand ?? '-' }}</span>
+                </td>
+
+                <!-- In Transit -->
+                <td>
+                  <span class="readonly-value">{{ currentDialogData.in_transit ?? '-' }}</span>
+                </td>
+
+                <!-- Safety Stock -->
+                <td>
+                  <span class="readonly-value">{{ currentDialogData.safety_stock ?? '-' }}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Forecast chart section (historical = solid, forecast = dashed) -->
+        <div class="forecast-chart-section">
+          <div *ngIf="isForecastLoading" class="forecast-loading">
+            <mat-spinner diameter="36"></mat-spinner>
+          </div>
+          <span *ngIf="tempModelName">Model Name: {{ tempModelName }}</span>
+          <div class="chart-container"
+            style="height: 260px; position: relative; background: #F7F2FA; border-radius: 6px;">
+            <canvas id="forecastCanvas"></canvas>
+          </div>
+
+          <div class="replenish-action" style="display:flex; justify-content:center; margin-top: 16px;">
+            <button mat-raised-button color="primary" (click)="confirmReplenishAndNavigate()">Replenish</button>
+          </div>
+        </div>
+
+
+      </div>
+    </ng-template>
+
+  </main>
+</div>

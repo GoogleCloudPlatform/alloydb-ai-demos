@@ -1,0 +1,74 @@
+<div class="form-container">
+  <div class="form-inner-container">
+    <div class="dialog-header">
+    <h2 mat-dialog-title class="title">
+      {{ isEditMode? 'Edit Product':'Add New Product'}}</h2>
+    <button mat-icon-button class="close-button" (click)="cancel()">
+      <mat-icon>close</mat-icon>
+    </button>
+    </div>
+<!-- ADD/EDIT form... -->
+    <mat-dialog-content>
+      <form [formGroup]="addEditProductForm" (ngSubmit)="save()">
+        <div class="form-grid">
+          <div class="form-row">
+            <mat-form-field class="form-field" appearance="outline">
+              <mat-label>Enter SKU</mat-label>
+              <input matInput formControlName="sku" />
+            </mat-form-field>
+          </div>
+
+          <mat-form-field class="form-field" appearance="outline">
+            <mat-label>Enter Product Name</mat-label>
+            <input matInput formControlName="name" /> </mat-form-field>
+
+          <mat-form-field class="form-field" appearance="outline">
+            <mat-label>Enter Category</mat-label>
+            <input matInput formControlName="category" /> </mat-form-field>
+
+
+
+          <mat-form-field class="form-field" appearance="outline">
+            <mat-label>Enter On Hand</mat-label>
+            <input matInput formControlName="on_hand" /> </mat-form-field>
+
+          <mat-form-field class="form-field" appearance="outline">
+            <mat-label>Enter Safety Stock</mat-label>
+            <input matInput formControlName="safety_stock" /> </mat-form-field>
+
+          <mat-form-field class="form-field" appearance="outline">
+            <mat-label>Enter Reorder Point</mat-label>
+            <input matInput formControlName="reorder_point" /> </mat-form-field>
+
+          <mat-form-field class="form-field" appearance="outline">
+            <mat-label>Enter In Transit</mat-label>
+            <input matInput formControlName="in_transit" /> </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-select formControlName="location">
+               <mat-option value=''>Select Location</mat-option>
+              <mat-option *ngFor="let location of locations"
+                [value]="location.location">{{location.location}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field class="form-field store-id-hidden" appearance="outline" >
+            <mat-label>Enter Store ID</mat-label>
+            <input matInput formControlName="store_id" readonly />
+          </mat-form-field>
+        </div>
+
+        <mat-dialog-actions align="center">
+          <button mat-button color="primary" class="form-button" type="submit" [disabled]="saving">
+            <div class="btn-content">
+            <mat-progress-spinner mode="indeterminate" diameter="22" *ngIf="loading" color="accent" class="white-spinner"></mat-progress-spinner>
+            <span *ngIf="!saving && !loading">{{ data.mode === 'add' ? 'Add Product' : 'Save Changes' }}</span>
+            <span *ngIf="loading">Inventory Agent is working...</span>
+          </div>
+          </button>
+        </mat-dialog-actions>
+
+      </form>
+    </mat-dialog-content>
+  </div>
+</div>

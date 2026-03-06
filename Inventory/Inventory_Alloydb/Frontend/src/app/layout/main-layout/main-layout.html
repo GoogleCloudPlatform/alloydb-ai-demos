@@ -1,0 +1,35 @@
+<div class="app-shell">
+  <!-- Hide sidebar & Show hamburger in case of small screens -->
+  <div class="hamburger" (click)="toggleSidebar()">
+    ☰
+  </div>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <ul class="nav-list">
+      <li routerLink="/dashboard" routerLinkActive="active" class="sidebar-menu">
+        <svg class="sidebar-menu-icon">
+          <use xlink:href="/icons/home.svg"></use>
+        </svg>
+        <span>Inventory Dashboard</span>
+      </li>
+
+      <li routerLink="/replenishment-recommendation" routerLinkActive="active" class="sidebar-menu">
+         <svg class="sidebar-menu-icon">
+          <use xlink:href="/icons/forum.svg"></use>
+        </svg>
+        <span>Replenishment Recommendation</span>
+      </li>
+
+      <li routerLink="/quantity-forecast" routerLinkActive="active" class="sidebar-menu">
+          <svg class="sidebar-menu-icon">
+            <use xlink:href="/icons/Vector.svg"></use>
+          </svg>
+          <span>Forecast</span>
+      </li>
+    </ul>
+  </aside>
+
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

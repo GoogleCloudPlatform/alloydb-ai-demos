@@ -1,0 +1,70 @@
+mat-form-field {
+  width: 48%;
+  margin-right: 2%;
+}
+
+.page-title-close-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+}
+
+.page-title {
+  color: var(--Schemes-Primary, #6750A4);
+  padding-left: 5px;
+  /* M3/headline/medium */
+  font-family: var(--Static-Headline-Medium-Font, Roboto);
+  font-size: var(--Static-Headline-Medium-Size, 28px);
+  font-style: normal;
+  font-weight: 400;
+  line-height: var(--Static-Headline-Medium-Line-Height, 36px);
+  /* 128.571% */
+  letter-spacing: var(--Static-Headline-Small-Tracking, 0);
+}
+
+.close-button {
+  position: absolute;
+  right: 8px;
+  color: #555;
+  border: none;
+  background: none;
+  padding-right: 15px;
+}
+
+mat-dialog-content {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  overflow: visible !important;
+  padding-top: 16px !important;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.po-loader {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.loading-text {
+  font-size: 16px;
+  color: #ede5e5;
+}
+
+.save-approve-button {
+  border-radius: 20px;
+  padding: 6px 24px;
+  background-color: #6750a4;
+  color: rgb(255, 255, 255);
+}

@@ -1,0 +1,262 @@
+:host {
+   zoom: 0.9;
+  display: block;
+  background-color: #FFFFFF;
+  font-family: Roboto;
+  color: #292f3a;
+}
+
+/* Page frame */
+.journey-page {
+  min-height: 100vh;
+}
+
+/* Header */
+.jp-header {
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: center;
+  border-bottom: 1px solid #eee;
+  background-color: #ffffff;
+
+  &__logo {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__logo img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+  }
+
+  &__logo-text {
+    font-weight: 600;
+    font-size: 1.1rem;
+    letter-spacing: 0.04em;
+  }
+}
+
+/* Main container */
+.jp-main {
+  padding: 2rem 1.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+/* Section base */
+.jp-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &--split {
+
+    .jp-section__content,
+    .jp-section__image {
+      flex: 1 1 50%;
+    }
+  }
+
+  &--reverse {
+    .jp-section__inner {
+      flex-direction: row-reverse;
+    }
+  }
+
+  &--center {
+    .jp-section__content {
+      text-align: center;
+    }
+  }
+}
+
+/* Restrict content width */
+.jp-section__content,
+.jp-section__image,
+.jp-section__full-image {
+  max-width: 1200px;
+  width: 100%;
+}
+
+.flowchart-image {
+  background-color: #F5EFF7;
+}
+
+.flowchart-image img {
+  max-width: 100%;
+  height: auto;
+}
+
+.dashboard-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0.15);
+}
+
+.dashboard-button {
+  position: absolute;
+  top: 50%;
+  left: 45%;
+  padding: 0.9rem 2.2rem;
+  font-size: 1rem;
+  z-index: 10;
+}
+
+.journey-bottom-section {
+  display: flex;
+  margin-top: 4rem;
+  justify-content: center;
+}
+
+.dashboard-preview {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+}
+
+/* Split layout wrapper */
+.jp-section--split {
+
+  .jp-section__content,
+  .jp-section__image {
+    padding: 1rem;
+  }
+
+  &>.jp-section__content,
+  &>.jp-section__image {
+    /* on small screens sections stack, so we wrap in an inner flex on large */
+  }
+
+  /* Inner flex for desktop */
+  &::before {
+    content: '';
+    display: none;
+  }
+}
+
+/* Use a separate wrapper to control the two-column layout */
+.jp-section--split {
+  display: flex;
+  justify-content: center;
+
+  &>.jp-section__content,
+  &>.jp-section__image {
+    max-width: 600px;
+  }
+}
+
+/* Titles and text */
+.jp-section__title {
+  font-family: Roboto;
+  font-size: 36px;
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.jp-section__subtitle {
+  font-size: 16px;
+  font-family: Roboto;
+  color: #79747E;
+  font-weight: 400;
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
+}
+
+.jp-section__content p {
+  font-size: 16px;
+  line-height: 1.6;
+  font-family: Roboto;
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+}
+
+/* Images */
+.jp-section__image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.jp-section__image img {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  object-fit: contain;
+}
+
+.jp-section__full-image {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+
+  img {
+    width: 100%;
+    max-width: 1200px;
+    border-radius: 1rem;
+    display: block;
+  }
+
+  &--shadow img {
+    box-shadow: 0 10px 40px rgba(35, 0, 96, 0.15);
+  }
+}
+
+/* Button */
+.jp-button {
+  outline: none;
+  margin-top: 1rem;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease;
+  border-radius: 100px;
+  padding: 8px 16px;
+  background: var(--Schemes-Primary, #6750A4);
+  border: none;
+  cursor: pointer;
+
+  color: var(--Schemes-On-Primary, white);
+  font-size: 16px;
+  font-family: Roboto;
+  font-weight: 500;
+  line-height: 24px;
+  letter-spacing: 0.15px;
+  word-wrap: break-word
+}
+
+/* Responsive layout */
+@media (min-width: 900px) {
+  .jp-main {
+    padding-inline: 2.5rem;
+  }
+
+  .jp-section--split {
+    flex-direction: row;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .jp-section--reverse {
+    flex-direction: row-reverse;
+  }
+
+  .jp-section__title {
+    font-size: 2rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .jp-main {
+    align-items: center;
+  }
+
+  .jp-section {
+    max-width: 1200px;
+  }
+}

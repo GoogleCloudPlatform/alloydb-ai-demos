@@ -1,0 +1,123 @@
+.form-container{
+display: flex;
+/* width: 974px !important; */
+padding: 32px;
+flex-direction: column;
+align-items: flex-start;
+gap: 10px;
+
+border-radius: 15px;
+background: var(--Schemes-On-Error, #FFF);
+}
+
+.form-inner-container{
+display: flex;
+padding: 0 10px;
+flex-direction: column;
+align-items: flex-start;
+gap: 10px;
+align-self: stretch;
+}
+
+.dialog-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+width: 100%;
+}
+
+.dialog-header .title {
+  margin: 0;
+  position: static !important;
+  color: var(--Schemes-Primary, #6750A4) !important;
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+.dialog-header h2{
+  margin: 0;
+}
+
+.close-button{
+  right:8px;
+  color: #555;
+  background: none;
+  border: none;
+}
+
+mat-dialog-content{
+display: flex;
+justify-content: space-between;
+flex-wrap: wrap;
+overflow: visible !important;
+padding-top: 16px !important;
+}
+
+.title{
+  align-self: stretch;
+  color: var(--Schemes-Primary, #6750A4);
+
+/* M3/headline/medium */
+font-family: var(--Static-Headline-Medium-Font, Roboto);
+font-size: var(--Static-Headline-Medium-Size, 28px);
+font-style: normal;
+font-weight: 400;
+line-height: var(--Static-Headline-Medium-Line-Height, 36px); /* 128.571% */
+letter-spacing: var(--Static-Headline-Small-Tracking, 0);
+position:absolute;
+top:8px;
+bottom: 8px;
+}
+
+.form-button{
+  border-radius: 100px;
+padding: 8px 16px;
+background: var(--Schemes-Primary, #6750A4);
+color: #fff !important;
+border: none;
+cursor: pointer;
+}
+
+
+.btn-content{
+display:flex;
+align-items:center;
+/* justify-content: center; */
+gap: 10px;
+}
+
+ .white-spinner ::ng-deep circle {
+   stroke: #fff !important;
+ }
+
+.form-field{
+display: flex;
+height: 56px;
+flex-direction: column;
+align-items: flex-start;
+flex: 1 0 0;
+border-radius: 4px 4px 0 0;
+}
+
+.form-row{
+  display: flex;
+align-items: center;
+gap: 24px;
+align-self: stretch;
+}
+
+.form-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 16px;
+}
+
+.actions {
+display: flex;
+justify-content: flex-end;
+margin-top: 20px;
+}
+
+.store-id-hidden {
+  display: none !important;
+}

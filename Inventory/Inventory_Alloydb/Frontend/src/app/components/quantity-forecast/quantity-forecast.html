@@ -1,0 +1,70 @@
+<header class="page-header">
+  <h2 class="forcast-title">Forecast Quantity</h2>
+</header>
+
+<form [formGroup]="dateStoreProductForm" class="po-form" (submit)="$event.preventDefault()">
+  <div class="row">
+    <mat-form-field appearance="outline" class="field">
+      <mat-label>Location</mat-label>
+      <mat-select formControlName="storeId">
+        <mat-option *ngFor="let store of storeList" [value]="store.id">
+          {{ store.location }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="field">
+      <mat-label>Product Name</mat-label>
+      <mat-select formControlName="sku">
+        <mat-option *ngFor="let item of skuProductList" [value]="item.sku">
+          {{ item.product_name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div class="row">
+    <mat-form-field appearance="outline" class="field">
+      <mat-label>Replenish Horizon(days)</mat-label>
+      <input matInput type="number" formControlName="horizon" min="0" max="30" />
+      <mat-hint>Enter 1 to 30</mat-hint>
+    </mat-form-field>
+  </div>
+
+  <!-- Centered predict button with loader directly below it -->
+  <div class="row center-row" style="margin-top:1rem;">
+    <div class="predict-column">
+      <button type="button" mat-raised-button class="predict-btn" (click)="predictQuantity()"
+        [disabled]="loading || dateStoreProductForm.invalid">
+        Predict Quantity
+      </button>
+
+      <!-- loader stays in DOM; toggled with [hidden] so it doesn't get recreated -->
+      <div class="loader-wrapper" [hidden]="!loading" [attr.aria-hidden]="!loading">
+        <div class="loader" aria-label="Loading forecast"></div>
+      </div>
+
+    </div>
+  </div>
+</form>
+
+<!-- Chart area -->
+<div class="chart-container" style="margin-top:1.5rem;">
+  <div class="chart-header">
+    <h3 class="forcast-subtitle" *ngIf="chartRendered && modelname?.trim()" aria-live="polite" role="status"> Model
+      name: {{ modelname }} </h3>
+  </div>
+
+  <!-- <div class="canvas-wrapper">
+    <canvas #forecastCanvas></canvas>
+  </div> -->
+  <div class="canvas-wrapper" style="position:relative;">
+  <canvas #forecastCanvas></canvas>
+
+  <!-- overlay shown when all values are zero -->
+  <div *ngIf="allZero" class="no-data-overlay" aria-live="polite" role="status">
+    No data to generate chart.
+  </div>
+</div>
+
+</div>

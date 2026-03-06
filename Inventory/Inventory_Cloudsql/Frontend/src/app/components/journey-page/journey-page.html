@@ -1,0 +1,86 @@
+<div class="journey-page">
+  <main class="jp-main">
+
+    <!-- SECTION 1: Hey, meet Sarah -->
+    <section class="jp-section jp-section--split">
+      <div class="jp-section__content">
+        <h2 class="jp-section__title">Hey, meet Sarah!</h2>
+        <p class="jp-section__subtitle"> She is an Inventory Manager for a major retail chain. Her day-to-day challenge is managing inventory across 50+ stores in the busy Pacific Northwest region. Her primary goal is simple: highlight the ability to foresee shortage in stock, and order it in advance to avoid it.
+        </p>
+
+      </div>
+
+      <div class="jp-section__image">
+        <!-- Image 1: person at desk / analytics --> <img src="/images/Character1.svg"
+          alt="Inventory manager working with analytics dashboard" />
+      </div>
+    </section>
+
+    <!-- SECTION 2: Inventory chaos -->
+    <section class="jp-section jp-section--split jp-section--reverse">
+      <div class="jp-section__content">
+        <h2 class="jp-section__title">Inventory chaos in the modern retail world</h2>
+        <p  class="jp-section__subtitle"> Demand is unpredictable, supplier lead times are uncertain, and deciding when and how much to reorder is
+          often manual and error-prone.This leads to massive write-offs from overstock and lost sales from stockouts. Sarah needs a smarter way to
+          plan inventory.
+        </p>
+      </div>
+
+      <div class="jp-section__image">
+        <!-- Image 2: people discussing / chaos illustration --> <img src="/images/Character2.svg"
+          alt="Team discussing inventory chaos" />
+      </div>
+    </section>
+
+    <!-- SECTION 3: Game-Changer -->
+    <section class="jp-section jp-section--split">
+      <div class="jp-section__content">
+        <h2 class="jp-section__title">Introducing Sarah’s Game-Changer</h2>
+        <p  class="jp-section__subtitle"> The Evaluator Validation Application brings together data, models, and intelligent agents to recommend the
+          right actions at the right time. From predicting shortages to automating reorders, this is Sarah’s new operating system for inventory.
+        </p>
+        <button class="jp-button jp-button--primary" type="button" [routerLink]="['/dashboard']"> Experience the Demo
+        </button>
+      </div>
+
+      <div class="jp-section__image">
+        <!-- Image 3: big illustration with charts/devices --> <img src="/images/Character3.svg"
+          alt="Agents and dashboards powering inventory management" />
+      </div>
+    </section>
+
+    <!-- SECTION 4: Journey of Sarah (Flowchart) -->
+    <section class="jp-section jp-section--center">
+      <div class="jp-section__content jp-section__content--center">
+        <h2 class="jp-section__title">The Journey of Sarah</h2>
+        <p class="jp-section__subtitle"> Step through Sarah’s world and follow her journey inside the new Inventory
+          Management Application — from login to intelligent recommendations and automated purchase orders.
+        </p>
+      </div>
+
+      <div class="jp-section__full-image" class="flowchart-image">
+        <!-- Image 4: big flowchart -->
+        <img src="/images/InventoryMgmtFlowChart.svg" alt="Flowchart showing Sarah's end-to-end journey" />
+      </div>
+    </section>
+
+    <!-- SECTION 5: Explore the Application (Inventory dashboard) -->
+    <section class="jp-section jp-section--center">
+      <div class="jp-section__content jp-section__content--center">
+        <h2 class="jp-section__title">Explore the Application</h2>
+        <p class="jp-section__subtitle"> Dive into the application interface that powers Sarah’s day-to-day decisions.
+          See how insights, alerts, and AI recommendations are surfaced in a single, intuitive dashboard.
+        </p>
+      </div>
+      <section class="journey-bottom-section">
+        <div class="jp-section__full-image jp-section__full-image--shadow dashboard-preview">
+          <!-- Image 5: inventory overview dashboard snapshot -->
+          <img src="/images/dashboardInBackground.svg" alt="Inventory overview dashboard" class="dashboard-image" />
+          <button class="jp-button jp-button--primary dashboard-button" color="primary" type="button"
+            [routerLink]="['/dashboard']"> Experience the Demo </button>
+        </div>
+      </section>
+    </section>
+
+  </main>
+</div>

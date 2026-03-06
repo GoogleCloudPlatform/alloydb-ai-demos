@@ -1,0 +1,11 @@
+runtime: nodejs24
+service: inventory-management-mysql
+instance_class: F4_1G
+
+env_variables:
+  NODE_ENV: production
+  entrypoint: node dist/inventory-management/server/server.mjs
+
+handlers:
+  - url: /(.*)
+    script: auto

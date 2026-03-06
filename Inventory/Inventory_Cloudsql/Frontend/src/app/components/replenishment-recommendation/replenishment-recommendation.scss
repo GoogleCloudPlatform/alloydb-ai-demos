@@ -1,0 +1,469 @@
+/* ===== Base Layout ===== */
+.replenishment-container {
+border-radius: 12px;
+background: #fff;
+display: flex;
+flex-direction: column;
+gap: 24px;
+box-sizing: border-box;
+max-width: 1200px;
+margin: 0 auto;
+}
+
+.table-title {
+  color: rgba(22, 26, 65, 0.78);
+
+  /* M3/title/medium */
+  font-family: var(--Static-Title-Medium-Font, Roboto);
+  font-size: var(--Static-Title-Medium-Size, 16px);
+  font-style: normal;
+  font-weight: 500;
+  line-height: var(--Static-Title-Medium-Line-Height, 24px);
+  /* 150% */
+  letter-spacing: var(--Static-Title-Medium-Tracking, 0.15px);
+}
+
+.table-scroll-wrapper .mat-mdc-header-cell {
+background:#FEF7FF;
+}
+
+.ws-snackbar{
+  background: #323232 !important;
+  color: #ffffff !important;
+  display: flex !important;
+  align-items: center;
+}
+
+.page-title{
+  color: var(--Schemes-Primary, #6750A4);
+
+/* M3/headline/medium */
+font-family: var(--Static-Headline-Medium-Font, Roboto);
+font-size: var(--Static-Headline-Medium-Size, 28px);
+font-style: normal;
+font-weight: 400;
+line-height: var(--Static-Headline-Medium-Line-Height, 36px); /* 128.571% */
+letter-spacing: var(--Static-Headline-Small-Tracking, 0);
+}
+
+/* ===== Form Section ===== */
+.po-form {
+display: flex;
+flex-wrap: wrap;
+gap: 16px;
+align-items: flex-start;
+justify-content: flex-start;
+}
+
+mat-form-field {
+flex: 1 1 320px;
+min-width: 250px;
+}
+
+.slider-section {
+flex: 1 1 100%;
+margin-top: 10px;
+}
+
+.create-new-po-button{
+  border-radius: 100px;
+padding: 8px 16px;
+background: var(--Schemes-Primary, #6750A4);
+color: #fff !important;
+border: none;
+cursor: pointer;
+}
+
+.white-spinner ::ng-deep circle {
+   stroke: #fff !important;
+ }
+
+.slider-label {
+display: flex;
+height: 28px;
+align-items: center;
+font-family: Roboto;
+font-size: 16px;
+font-weight: 500;
+margin-bottom: 4px;
+color: var(--Schemes-On-Surface-Variant, #49454F);
+line-height: var(--Static-Title-Medium-Line-Height, 24px); /* 150% */
+letter-spacing: var(--Static-Title-Medium-Tracking, 0.15px);
+}
+
+.slider-container {
+display: flex;
+align-items: center;
+gap: 6px;
+width: 100%;
+}
+
+.slider {
+flex: 1 1 100%;
+}
+
+.day-labels {
+display: flex;
+justify-content: space-between;
+font-size: 12px;
+color: #666;
+margin-top: 8px;
+}
+
+
+.btn-content{
+display:flex;
+align-items:center;
+/* justify-content: center; */
+gap: 10px;
+}
+
+.day-labels span{
+  transform : translate(-50%);
+  display: inline-block;
+}
+// .mat-mdc-slider-value-indicator {
+//   // transform: translateX(-50%) !important;
+//   left: calc(50% - 4px) !important;
+// }
+
+/* ===== Button Section ===== */
+.button-section {
+flex: 1 1 100%;
+text-align: center;
+margin-top: 16px;
+}
+
+.button-section button {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+gap: 8px;
+border-radius: 100px;
+background: #6750a4;
+color: #fff;
+padding: 10px 20px;
+border: none;
+cursor: pointer;
+transition: background 0.25s ease;
+}
+
+.button-section button:hover {
+background: #7c61c2;
+}
+
+/* ===== edit-approve Button Section ===== */
+.edit-approve-button-section {
+gap: 10px;
+display: flex;
+justify-content: flex-end;
+align-items: center;
+}
+
+@mixin buttons{
+display: inline-flex;
+align-items: center;
+justify-content: center;
+gap: 8px;
+border-radius: 100px;
+
+padding: 10px 20px;
+border: none;
+cursor: pointer;
+transition: background 0.25s ease;
+}
+
+.approve-button-section button {
+@include buttons;
+background: #6750a4;
+color: #fff;
+}
+
+.edit-button-section button {
+  @include buttons;
+  background: var(--Schemes-Secondary-Container, #E8DEF8);
+  color: #4A4459;
+}
+
+/* ===== Error Message ===== */
+.error-banner {
+display: flex;
+align-items: center;
+justify-content: flex-start;
+background-color: #f8d7da;
+color: #721c24;
+border: 1px solid #f5c6cb;
+border-radius: 6px;
+padding: 10px 14px;
+font-size: 15px;
+font-weight: 500;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+margin-top: 16px;
+width: 100%;
+box-sizing: border-box;
+}
+
+.error-icon {
+margin-right: 8px;
+color: #dc3545;
+font-size: 20px;
+}
+
+/* ===== Table Section ===== */
+.table-section {
+width: 100%;
+}
+
+.full-width-table {
+width: 100%;
+border-collapse: collapse;
+}
+
+.table-header {
+position: sticky;
+top: 0;
+background: #FEF7FF;
+color: var(--Schemes-On-Secondary-Container, #4A4459);
+
+/* M3/body/small-emphasized */
+font-family: var(--Static-Body-Small-Font, Roboto);
+font-size: var(--Static-Body-Small-Size, 12px);
+font-style: normal;
+font-weight: 500;
+line-height: var(--Static-Body-Small-Line-Height, 16px); /* 133.333% */
+letter-spacing: var(--Static-Body-Small-Tracking, 0.4px);
+}
+
+.full-width-table td {
+padding: 8px 16px;
+border-bottom: 1px solid #eee;
+}
+
+tr[mat-row]:hover {
+  background: #EADDFF;
+  font-weight: 500;
+}
+
+tr[mat-row] {
+  overflow: hidden;
+  color: var(--Schemes-On-Secondary-Container, #4A4459);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+/* M3/body/medium */
+font-family: var(--Static-Body-Medium-Font, Roboto);
+font-size: var(--Static-Body-Medium-Size, 14px);
+font-style: normal;
+font-weight: 400;
+line-height: var(--Static-Body-Medium-Line-Height, 20px); /* 142.857% */
+letter-spacing: var(--Static-Body-Medium-Tracking, 0.25px);
+}
+
+/* PO header + filter */
+.po-table-title-filter, .table-title-button {
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+
+/* button */
+.add-new-product-button {
+border-radius: 100px;
+padding: 8px 16px;
+background: var(--Schemes-Primary, #6750A4);
+color: #fff !important;
+border: none;
+cursor: pointer;
+}
+
+.btn-content{
+display:flex;
+align-items:center;
+/* justify-content: center; */
+gap: 10px;
+}
+
+ .white-spinner ::ng-deep circle {
+   stroke: #fff !important;
+ }
+
+.table-design {
+padding: 12px;
+border-radius: 10px;
+border: 1px solid var(--Schemes-Surface-Variant, #E7E0EC);
+background: #fff;
+}
+
+/* wrapper that gives a fixed height and scroll for table body */
+.table-scroll-wrapper {
+width: 100%;
+max-height: 360px; /* adjust as required */
+overflow-y: auto;
+border-radius: 8px;
+border: 1px solid rgba(0,0,0,0.06);
+}
+
+
+/* When table content has many columns allow horizontal scroll */
+.table-scroll-wrapper {
+overflow-x: auto;
+-webkit-overflow-scrolling: touch;
+}
+
+ .status-dropdown {
+   min-width: 200px !important;
+   margin-top: 15px !important;
+ }
+/* ===== Mobile & Tablet Responsiveness ===== */
+
+/* Tablets */
+@media (max-width: 992px) {
+.replenishment-container {
+padding: 16px;
+}
+
+mat-form-field {
+flex: 1 1 45%;
+}
+
+.table-container {
+max-height: 350px;
+}
+
+.button-section button {
+padding: 8px 16px;
+}
+}
+
+/* Small Devices (Mobile) */
+@media (max-width: 680px) {
+.po-form {
+flex-direction: column;
+gap: 12px;
+}
+
+mat-form-field {
+width: 100%;
+}
+
+.slider-label {
+font-size: 14px;
+}
+
+.button-section button {
+width: 100%;
+font-size: 14px;
+}
+
+.error-banner {
+font-size: 14px;
+flex-wrap: wrap;
+}
+
+.table-container {
+max-height: 300px;
+overflow-x: auto;
+}
+
+.full-width-table th,
+.full-width-table td {
+padding: 8px 12px;
+font-size: 13px;
+}
+}
+
+
+@media (max-width: 680px) {
+.content {
+padding: 12px;
+}
+
+/* tables: allow horizontal scroll, reduce padding and font-size */
+.full-width-table th, .full-width-table td {
+padding: 8px 10px;
+font-size: 13px;
+}
+
+.table-scroll-wrapper {
+max-height: 360px;
+}
+
+.add-new-product-button {
+padding: 6px 12px;
+font-size: 13px;
+}
+}
+
+/* Extra small phones */
+@media (max-width: 420px) {
+.full-width-table th,
+.full-width-table td {
+padding: 6px 8px;
+font-size: 12px;
+}
+
+.button-section button {
+padding: 6px 12px;
+font-size: 13px;
+}
+
+.error-banner {
+font-size: 13px;
+}
+}
+
+/* ===== Slider thumb customization ===== */ ::ng-deep .mdc-slider__thumb-knob {
+width: 20px !important;
+height: 20px !important;
+}
+
+/* ===== Scoped: only the filled (sliding) portion is purple ===== */
+.replenishment-container {
+  /* ensure we don't force the whole slider to primary */
+  ::ng-deep .mdc-slider,
+  ::ng-deep .mat-mdc-slider {
+    --mdc-theme-primary: initial !important;
+  }
+
+  /* inactive track (unfilled) — keep light gray */
+  ::ng-deep .mdc-slider__track,
+  ::ng-deep .mdc-slider__track-line,
+  ::ng-deep .mat-mdc-slider .mat-mdc-slider-track,
+  ::ng-deep .mat-mdc-slider .mat-mdc-slider-track-line {
+    background-color: #E0E0E0 !important;
+    border-color: transparent !important;
+  }
+
+  /* the actual filled element (sliding color) — target multiple possible class names */
+  ::ng-deep .mdc-slider__track-fill,
+  ::ng-deep .mdc-slider__track--active_fill,
+  ::ng-deep .mdc-slider__track .mdc-slider__track-fill,
+  ::ng-deep .mat-mdc-slider .mat-mdc-slider-track-fill {
+    background-color: #6750A4 !important;
+    /* if the fill is implemented as a border or pseudo-element, force those too */
+    border-color: #6750A4 !important;
+  }
+
+  /* sometimes the active line is drawn with a pseudo-element — override it */
+  ::ng-deep .mdc-slider__track-fill::before,
+  ::ng-deep .mdc-slider__track-fill::after,
+  ::ng-deep .mat-mdc-slider .mat-mdc-slider-track-fill::before,
+  ::ng-deep .mat-mdc-slider .mat-mdc-slider-track-fill::after {
+    background-color: #6750A4 !important;
+    border-color: #6750A4 !important;
+    content: '' !important;
+  }
+
+  /* keep thumb and indicator purple */
+  ::ng-deep .mdc-slider__thumb-knob,
+  ::ng-deep .mat-mdc-slider .mat-mdc-slider-thumb {
+    background-color: #6750A4 !important;
+    border-color: #6750A4 !important;
+  }
+
+  ::ng-deep .mdc-slider__value-indicator,
+  ::ng-deep .mat-mdc-slider .mat-mdc-slider-value-indicator {
+    background-color: #6750A4 !important;
+    color: #fff !important;
+  }
+}
+

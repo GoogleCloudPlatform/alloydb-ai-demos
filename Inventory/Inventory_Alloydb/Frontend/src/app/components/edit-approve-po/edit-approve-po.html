@@ -1,0 +1,33 @@
+<div class="page-title-close-button">
+  <h2 class="page-title">Edit Recommendations</h2>
+  <button mat-icon-button class="close-button" (click)="onCancel()">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<mat-dialog-content>
+  <form [formGroup]="editForm">
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Recommended Quantity</mat-label>
+      <input matInput formControlName="recommendedQuantity" type="number" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Select Supplier</mat-label>
+      <mat-select formControlName="supplier">
+        <mat-option *ngFor="let supplier of suppliers" [value]="supplier.id">{{supplier.name}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+ <!-- Save and approve edited/updated PO information -->
+  <button mat-raised-button color="primary" class="save-approve-button" (click)="onSave()"
+    [disabled]="loading || editForm.invalid">
+    <ng-container *ngIf="!loading">Save & Approve PO</ng-container>
+    <ng-container class="po-loader" *ngIf="loading">
+      <div class="loading-text">PO Agent is working...</div>
+    </ng-container>
+  </button>
+</mat-dialog-actions>

@@ -1,0 +1,14 @@
+<header class="app-header">
+  <!-- left logo -->
+  <div class="header-left" [routerLink]="['/user-journey']" title="Go to Homepage">
+    <img src="/images/Inventory Manager.svg" class="app-logo" />
+  </div>
+  <!-- right icon for user guide -->
+  <div class="header-right">
+    <button  class="user-guide-btn" title="User Guide" (click)="openUserGuide()">
+      <span class="material-icons">help_outline</span>
+    </button>
+  </div>
+
+</header>
+<router-outlet></router-outlet>

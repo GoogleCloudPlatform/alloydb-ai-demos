@@ -1,0 +1,803 @@
+/* Dashboard shell */
+.dashboard {
+  zoom: 0.9;
+  display: block;
+  width: 100%;
+}
+
+/* content area (the area inside main) */
+.content {
+  padding: 16px;
+  box-sizing: border-box;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* header */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* KPI Cards: fluid grid */
+.kpi-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  cursor: pointer;
+}
+
+.low-stock-items,
+.critical-items {
+  display: flex;
+  min-width: 200px;
+  padding: 24px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  flex: 1 0 0;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.total-skus-items,
+.over-stock-items {
+  display: flex;
+  min-width: 200px;
+  padding: var(--24, 24px);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  flex: 1 0 0;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.active-card {
+  outline: 2px solid #2563eb;
+}
+
+.card-table-title {
+  font-weight: 400;
+  font-size: 20px;
+}
+
+.kpi-title {
+  font-size: 14px;
+  color: rgba(22, 26, 65, 0.7);
+  margin-bottom: 6px;
+}
+
+.kpi-value {
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.low-stock-items {
+  border-left: 6px solid #f59e0b;
+}
+
+.over-stock-items {
+  border-left: 6px solid #3b82f6;
+}
+
+.critical-items {
+  border-left: 6px solid #ef4444;
+}
+
+/* Table section */
+.table-section {
+  margin-top: 8px;
+  width: 100%;
+}
+
+.table-header {
+  position: sticky;
+  top: 0;
+}
+
+tr[mat-row]:hover {
+  background: #EADDFF;
+  font-weight: 500;
+}
+
+tr[mat-row] {
+  overflow: hidden;
+  color: var(--Schemes-On-Secondary-Container, #4A4459);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--Static-Body-Medium-Font, Roboto);
+  font-size: var(--Static-Body-Medium-Size, 14px);
+  font-style: normal;
+  font-weight: 400;
+  line-height: var(--Static-Body-Medium-Line-Height, 20px);
+  letter-spacing: var(--Static-Body-Medium-Tracking, 0.25px);
+}
+
+.imgClass {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4pc;
+}
+
+.loading-text {
+  font-size: 16px;
+  color: #666;
+  padding-bottom: 20px;
+}
+
+/* wrapper that gives a fixed height and scroll for table body */
+.table-scroll-wrapper {
+  width: 100%;
+  max-height: 360px;
+  overflow-y: auto;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* make table full width and header sticky */
+.full-width-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* optional: limit cell padding for small screens */
+.full-width-table th,
+.full-width-table td {
+  padding: 8px 12px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.table-scroll-wrapper .mat-mdc-header-cell {
+  background: var(--Schemes-Surface, #FEF7FF);
+}
+
+/* Charts responsive grid */
+.charts {
+  display: flex;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+/* chart card */
+.status-distribution {
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--Schemes-Surface-Container-High, #ECE6F0);
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 260px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.chart-box {
+  height: 240px !important;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* overlay shown while donut chart is loading */
+.chart-overlay {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+}
+
+/* ensure canvas sits below overlay */
+.chart-box canvas {
+  width: 100% !important;
+  height: 100% !important;
+  position: relative;
+  z-index: 1;
+}
+
+.chart-title {
+  color: rgba(22, 26, 65, 0.78);
+  font-family: var(--Static-Title-Medium-Font, Roboto);
+  font-size: var(--Static-Title-Medium-Size, 16px);
+  font-style: normal;
+  font-weight: 500;
+  line-height: var(--Static-Title-Medium-Line-Height, 24px);
+  letter-spacing: var(--Static-Title-Medium-Tracking, 0.15px);
+}
+
+/* Table designs for other sections */
+.table-design {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--Schemes-Surface-Variant, #E7E0EC);
+  background: #fff;
+}
+
+.loading-container {
+  top: 40%;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.loading-container,
+.no-data {
+  padding: 32px 0;
+  text-align: center;
+  color: #666;
+}
+
+/* small tweaks */
+.tab-table-design {
+  margin-bottom: 12px;
+}
+
+.dashboard-title {
+  color: var(--Schemes-Primary, #6750A4);
+  font-family: var(--Static-Headline-Medium-Font, Roboto);
+  font-size: var(--Static-Headline-Medium-Size, 28px);
+  font-style: normal;
+  font-weight: 400;
+  line-height: var(--Static-Headline-Medium-Line-Height, 36px);
+  letter-spacing: 0;
+}
+
+.po-table-title-filter,
+.table-title-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.table-title {
+  color: #0f0f0f;
+  font-family: Roboto;
+  font-size: 28px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 36px;
+  letter-spacing: 0;
+}
+
+/* button */
+.add-new-product-button {
+  border-radius: 100px;
+  padding: 8px 16px;
+  background: var(--Schemes-Primary, #6750A4);
+  color: #fff !important;
+  border: none;
+  cursor: pointer;
+}
+
+/* Replenish button */
+.replenish-button {
+  min-width: 88px;
+  background-color: #EADDFF;
+  height: 36px;
+  color: #4A4459;
+  font-size: 14px;
+  font-family: Roboto, sans-serif;
+  font-weight: 500;
+  line-height: 20px;
+  border-radius: 20px;
+  padding: 8px 20px;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: background-color 150ms ease;
+}
+
+.replenish-button:hover,
+.replenish-button:focus-visible {
+  background-color: #CCC2DC;
+}
+
+
+
+
+/* Dialog table styles */
+.replenish-dialog-table {
+  width: auto;
+  max-width: 92vw;
+  max-height: 80vh;
+  overflow: auto;
+  padding: 16px;
+  background: #fff;
+  border-radius: 8px;
+  box-sizing: border-box;
+  box-shadow: 0 6px 18px rgba(16, 24, 40, 0.06);
+}
+
+.replenish-dialog-table .dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.dialog-table-wrapper {
+  overflow-x: auto;
+  margin-bottom: 12px;
+}
+
+.dialog-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 820px;
+  background: #fff;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.dialog-table thead th {
+  text-align: left;
+  padding: 10px 12px;
+  background: #FEF7FF;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  color: #4A4459;
+  font-size: 12px;
+}
+
+.dialog-table tbody td {
+  padding: 10px 12px;
+  vertical-align: middle;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  font-size: 14px;
+  color: rgba(22, 26, 65, 0.85);
+}
+
+/* Product cell: image + name */
+.product-cell .product-inline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.product-cell img {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.product-name {
+  font-weight: 500;
+  color: #222;
+}
+
+/* inputs inside dialog table */
+.dialog-table input[matInput] {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #fff;
+  font-size: 13px;
+  color: rgba(22, 26, 65, 0.9);
+}
+
+/* dialog actions */
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* small responsive tweaks */
+@media (min-width: 1101px) and (max-width: 1440px) {
+  .status-distribution {
+    max-width: 510px !important;
+  }
+}
+
+@media (min-width: 1441px) and (max-width: 1920px) {
+  .status-distribution {
+    max-width: 620px !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .kpi-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .table-scroll-wrapper {
+    max-height: 320px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .kpi-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .table-scroll-wrapper {
+    max-height: 320px;
+  }
+}
+
+@media (max-width: 680px) {
+  .content {
+    padding: 12px;
+  }
+
+  .kpi-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .charts {
+    grid-template-columns: 1fr;
+  }
+
+  .status-distribution {
+    min-height: 180px;
+    max-width: 315px;
+  }
+
+  .full-width-table th,
+  .full-width-table td {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .table-scroll-wrapper {
+    max-height: 360px;
+  }
+
+  .add-new-product-button {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .dialog-table {
+    min-width: 600px;
+  }
+
+  .product-cell img {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+@media (max-width: 420px) {
+
+  .full-width-table th,
+  .full-width-table td {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+
+  .table-scroll-wrapper {
+    max-height: 300px;
+  }
+}
+
+/* =========================
+   Global dialog autosize rules
+   Put these in styles.scss (global) or use ::ng-deep if you must scope them
+   ========================= */
+
+/* Make Material dialog containers autosize to content while respecting viewport */
+.mat-dialog-container,
+.mat-mdc-dialog-container {
+  box-sizing: border-box;
+  width: auto !important;
+  height: auto !important;
+  max-width: 90vw !important;
+  max-height: 90vh !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  display: inline-block;
+  transition: width 160ms ease, height 160ms ease;
+  border-radius: 8px;
+  background: #fff;
+}
+
+/* Center overlay panes and allow inline-block dialog to shrink-to-fit */
+.cdk-global-overlay-wrapper,
+.cdk-overlay-pane {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Inner content constraints and scroll handling */
+.mat-dialog-container>*,
+.mat-mdc-dialog-container>* {
+  box-sizing: border-box;
+  max-width: 100%;
+  max-height: 80vh;
+  overflow: auto;
+  padding: 16px;
+}
+
+/* Optional per-dialog class for fine-grained control */
+.auto-size-dialog.mat-dialog-container,
+.auto-size-dialog.mat-mdc-dialog-container {
+  max-width: 92vw !important;
+  max-height: 88vh !important;
+  padding: 0 !important;
+}
+
+.auto-size-dialog .dialog-content {
+  padding: 12px;
+}
+
+/* Small helper: compact dialog variant */
+.compact-dialog.mat-dialog-container,
+.compact-dialog.mat-mdc-dialog-container {
+  max-width: 720px !important;
+  max-height: 80vh !important;
+}
+
+/* Ensure template-based dialogs (opened with TemplateRef) also get the same behavior */
+::ng-deep .mat-dialog-container .replenish-dialog-table,
+::ng-deep .mat-mdc-dialog-container .replenish-dialog-table {
+  width: auto;
+  max-width: 92vw;
+  max-height: 80vh;
+  overflow: auto;
+}
+
+/* Accessibility: ensure focus outlines remain visible */
+.mat-dialog-container :focus,
+.mat-mdc-dialog-container :focus {
+  outline: 2px solid rgba(99, 102, 241, 0.6);
+  outline-offset: 2px;
+}
+
+/* Add styles for chart area and button alignment */
+.forecast-chart-section {
+  .chart-container {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 12px;
+  }
+
+  .forecast-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 260px;
+  }
+
+  .replenish-action button {
+    min-width: 160px;
+  }
+}
+
+/* ensure dialog canvas fills available area */
+.replenish-large-dialog .mat-dialog-container {
+  padding: 16px;
+}
+
+.replenish-large-dialog canvas {
+  width: 100% !important;
+
+}
+
+/* =========================
+   Replenish modal exact sizing and responsive rules
+   (Added to match width: 900px and height: 640px used when opening dialog)
+   ========================= */
+
+/* Exact modal sizing for replenish dialog */
+.replenish-large-dialog.mat-dialog-container,
+.replenish-large-dialog.mat-mdc-dialog-container {
+  width: 920px !important;
+  /* desktop target (slightly wider than 900 for padding) */
+  max-width: 95vw !important;
+  /* responsive cap */
+
+  max-height: 90vh !important;
+  /* ensure it never exceeds viewport */
+  padding: 16px !important;
+  box-sizing: border-box;
+}
+
+/* Inner content wrapper (keeps table + chart scrollable if needed) */
+.replenish-large-dialog .replenish-dialog-table {
+  width: 100%;
+  max-width: 880px;
+
+  max-height: 608px;
+  /* 640 - padding (16*2) - small header/footer */
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Chart container: ensure canvas has room for slanted labels */
+.replenish-large-dialog .chart-container {
+  height: 320px;
+  /* increase to give space for rotated labels */
+  padding: 12px 8px 44px 8px;
+  /* extra bottom padding for slanted x-axis labels */
+  background: #F7F2FA;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+/* Make canvas fill the chart container */
+.replenish-large-dialog canvas {
+  width: 100% !important;
+
+  display: block;
+}
+
+/* Center the Replenish button and keep it visible on small screens */
+.replenish-large-dialog .replenish-action {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+  flex-shrink: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 960px) {
+  .replenish-large-dialog.mat-dialog-container {
+    width: 92vw !important;
+    height: auto !important;
+    max-height: 85vh !important;
+  }
+
+  .replenish-large-dialog .chart-container {
+    height: 280px;
+    padding-bottom: 56px;
+    /* more room for labels on narrow screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .replenish-large-dialog.mat-dialog-container {
+    width: 96vw !important;
+    height: auto !important;
+    max-height: 88vh !important;
+    padding: 12px !important;
+  }
+
+  .replenish-large-dialog .chart-container {
+    height: 220px;
+    padding-bottom: 64px;
+  }
+
+  .replenish-large-dialog .replenish-action button {
+    width: 90%;
+    min-width: 0;
+  }
+}
+
+/* inventory-dashboard.component.scss */
+/* Place this near the end of the file so it overrides earlier rules */
+::ng-deep .replenish-large-dialog .mat-mdc-dialog-surface {
+  width: 920px !important;
+  max-width: 95vw !important;
+  min-width: 320px !important;
+  height: 500px !important;
+  max-height: 100vh !important;
+  box-sizing: border-box;
+  padding: 0 !important;
+  transform: none !important;
+  border-radius: 8px;
+  background-color: var(--mat-dialog-container-color, #fff);
+  box-shadow: 0 6px 18px rgba(16, 24, 40, 0.06);
+}
+
+/* ensure inner content fits */
+::ng-deep .replenish-large-dialog .mat-mdc-dialog-surface>.replenish-dialog-table {
+  width: 100%;
+
+  overflow: auto;
+  box-sizing: border-box;
+}
+
+/* Ensure dialog inner wrapper stretches so actions can sit flush to bottom */
+.replenish-large-dialog .replenish-dialog-table {
+  display: flex;
+  flex-direction: column;
+
+  padding-bottom: 0;
+  /* remove extra inner padding */
+  gap: 0;
+  /* remove gap so actions are flush */
+  box-sizing: border-box;
+}
+
+/* Push actions to the bottom and remove extra top/bottom spacing */
+.replenish-large-dialog .replenish-action {
+  margin-top: auto;
+  /* push to bottom of the flex column */
+  margin-bottom: 0;
+  /* ensure no space below the action row */
+  padding-bottom: 0;
+  display: flex;
+  justify-content: center;
+  /* center-align the button */
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Style the Replenish button: purple background, white text, no extra border gap */
+.replenish-large-dialog .replenish-action button,
+::ng-deep .replenish-large-dialog .replenish-action button {
+  background: #6750A4 !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+  box-shadow: none;
+  padding: 8px 20px;
+  min-width: 160px;
+  border-radius: 20px;
+}
+
+/* Small-screen tweak: keep button centered and full width if needed */
+@media (max-width: 480px) {
+  .replenish-large-dialog .replenish-action button {
+    width: 90%;
+    min-width: 0;
+  }
+}
+
+.replenish_title {
+  color: var(--Schemes-Primary, #6750A4);
+  font-size: 28px;
+  font-family: Roboto;
+  font-weight: 400;
+  line-height: 36px;
+  word-wrap: break-word
+}
+
+.table-header-replenish {
+  color: var(--Schemes-On-Secondary-Container, #4A4459);
+  font-size: 12px;
+  font-family: Roboto;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: 0.40px;
+  word-wrap: break-word
+}
+
+.edit-button {
+  /* Edit */
+  color: var(--Schemes-On-Secondary-Container, #4A4459);
+  background-color: #EADDFF;
+  font-size: 14px;
+  font-family: Roboto, sans-serif;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.10px;
+  word-wrap: break-word;
+  border: none;
+  border-radius: 20px;
+  outline: none;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.edit-button:hover,
+.edit-button:focus-visible {
+  background-color: #CCC2DC;
+}
+
+
+
+

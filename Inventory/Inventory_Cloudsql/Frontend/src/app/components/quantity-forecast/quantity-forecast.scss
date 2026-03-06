@@ -1,0 +1,166 @@
+.po-form {
+  display: flex;
+  flex-direction: column;
+  padding: 0.2rem;
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .field {
+    flex: 1;
+    min-width: 220px;
+  }
+
+  ::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline {
+    color: #673ab7;
+  }
+
+  ::ng-deep .mat-form-field-label {
+    font-weight: 500;
+    color: #444;
+  }
+
+  ::ng-deep .mat-input-element,
+  ::ng-deep .mat-select-value {
+    font-size: 0.95rem;
+    padding: 0.25rem 0;
+  }
+
+  @media (max-width: 768px) {
+    .row {
+      flex-direction: column;
+    }
+
+    .field {
+      width: 100%;
+    }
+  }
+}
+
+/* Title */
+.forcast-title {
+  color: var(--Schemes-Primary, #6750A4);
+  font-size: 28px;
+  padding: 0.2rem;
+  font-family: Roboto;
+  font-weight: 400;
+  line-height: 36px;
+  word-wrap: break-word;
+}
+
+/* Predict button column: centers button and places loader below it */
+.center-row {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.predict-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Predict button custom color */
+.predict-btn {
+  background-color: #6750A4 !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+  border-radius: 100px;
+  padding: 0.5rem 1.25rem;
+  min-width: 180px;
+}
+
+/* Hover/focus states */
+.predict-btn:hover {
+  background-color: #5a4790 !important;
+}
+
+/* Loader wrapper and loader */
+.loader-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+}
+
+/* simple inline loader */
+.loader {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid rgba(103,80,164,0.15);
+  border-top-color: #6750A4;
+  animation: loader-spin 0.9s linear infinite;
+  display: inline-block;
+  opacity: 1;
+  transition: opacity 160ms ease-in-out;
+}
+
+/* If you prefer CSS-class toggling instead of [hidden], use .hidden to fade */
+.loader.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes loader-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Chart area layout */
+.chart-container {
+  height: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.25rem;
+}
+
+/* subtitle */
+.forcast-subtitle {
+  color: var(--Schemes-Primary, #6750A4);
+  font-size: 16px;
+  padding: 0.2rem;
+  font-family: Roboto;
+  font-weight: 400;
+  word-wrap: break-word;
+}
+
+/* Canvas wrapper ensures explicit height for Chart.js layout */
+.canvas-wrapper {
+  flex: 1 1 auto;
+  min-height: 300px;
+  position: relative;
+}
+/* ensure [hidden] actually hides the wrapper */
+.loader-wrapper[hidden] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+.canvas-wrapper { position: relative; }
+.no-data-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.9);
+  color: #666;
+  font-weight: 500;
+  font-size: 16px;
+  pointer-events: none;
+  border-radius: 6px;
+}

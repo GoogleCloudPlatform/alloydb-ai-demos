@@ -1,0 +1,215 @@
+/* Base layout */
+:root {
+  --sidebar-width: 220px;
+  --sidebar-collapsed-width: 72px;
+  --gap: 16px;
+}
+
+/* hide native checkbox visually but keep accessible */
+.nav-toggle {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.sidebar-menu-icon {
+  height: 20px;
+  width: 20px;
+  object-fit: contain;
+  fill:black;
+}
+
+.open-new-window {
+  height: 20px;
+  width: 20px;
+  object-fit: contain;
+  fill:black;
+  padding-right: 10px;
+  margin-left:auto;
+}
+
+.sidebar-menu {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+}
+
+.sidebar-menu-link {
+  display:flex;
+  align-items: center;
+  text-decoration: none;
+  width: 100%;
+  gap: 10px;
+  color: black;
+  text-decoration: none;
+}
+
+.hamburger {
+  display: none;
+  /* hidden on desktop */
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  font-size: 28px;
+  cursor: pointer;
+  z-index: 1001;
+  user-select: none;
+}
+
+/* page shell */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  background: #fafafa;
+}
+
+/* sidebar */
+.sidebar {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  bottom: 0;
+  width: 240px;
+  background: #fff;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  box-sizing: border-box;
+  border-right: 1px solid rgba(0, 0, 0, 0.04);
+  transition: transform .25s ease, width .25s ease;
+  z-index: 900;
+}
+
+/* brand */
+.sidebar-brand {
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+/* nav */
+.nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-list li {
+  padding: 12px 16px 12px 24px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  cursor: pointer;
+}
+
+.nav-list li:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.nav-list li.active {
+  background: #e7e0ec;
+  font-weight: 500;
+  box-shadow: inset 3px 0 0 rgba(0, 0, 0, 0.08);
+  color: #4F378A;
+}
+
+.nav-list .li .span {
+  color: var(--Schemes-On-Surface-Variant, #49454F);
+
+  font-family: var(--Static-Title-Small-Font, Roboto);
+  font-size: var(--Static-Title-Small-Size, 14px);
+  font-style: normal;
+  font-weight: 500;
+  line-height: var(--Static-Title-Small-Line-Height, 20px);
+  /* 142.857% */
+  letter-spacing: var(--Static-Title-Small-Tracking, 0.1px);
+}
+
+/* main content */
+.main-content {
+  flex: 1;
+  padding: 24px;
+  box-sizing: border-box;
+  overflow: auto;
+  background:#fff;
+  padding: 16px;
+  margin-top:64px;
+  /* margin-left: 240px; */
+  height: calc(100vh - 64px);
+  overflow-y: auto
+}
+
+/* ---------- Responsive behavior ---------- */
+
+/* Tablet: slightly reduce sidebar width */
+@media (max-width: 1100px) {
+  :root {
+    --sidebar-width: 180px;
+  }
+}
+
+/* Small screens: show hamburger and hide sidebar by default */
+@media (max-width: 880px) {
+  .nav-toggle-label {
+    display: block;
+  }
+
+  /* hide the sidebar off-canvas */
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 230px;
+    /* drawer width on mobile */
+    transform: translateX(-110%);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  /* push main content slightly for focus */
+  .main-content {
+    padding: 12px;
+  }
+}
+
+@media (min-width: 901px) {
+  .main-content {
+    margin-left: 0px;
+  }
+
+  .sidebar {
+    position : relative;
+    transform: translateX(0);
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 900px) {
+
+  /* Show hamburger */
+  .hamburger {
+    display: block;
+  }
+
+  /* Sidebar becomes hidden */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    transform: translateX(-100%);
+    z-index: 1000;
+    width: 240px;
+    padding-top: 56px;
+  }
+
+  /* When toggled (via .sidebar-open class), show sidebar */
+  .app-shell.sidebar-open .sidebar {
+    transform: translateX(0);
+  }
+
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+  }
+}
