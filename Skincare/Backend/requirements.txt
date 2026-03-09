@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+asyncpg
+langchain
+langgraph
+google-generativeai # For ChatGoogleGenerativeAI used in graph.py
+pydantic # Used by FastAPI for data models (e.g., ChatRequest, MagicApiResponse)
+dotenv
+# You might also need specific LangChain integrations if using other models/tools,
+# e.g., langchain-google-genai is implicitly needed here for ChatGoogleGenerativeAI
+pydantic_settings
+langchain_google_genai
+google-genai
