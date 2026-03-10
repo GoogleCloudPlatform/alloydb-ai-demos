@@ -1,0 +1,89 @@
+/* You can add global styles to this file, and also import other style files */
+/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+@use 'sass:color';
+html {
+  $screenshot-button-color: #c63333;
+  $undo-button-color: #343434;
+
+  --brand-color: rgb(78, 58, 118);
+  --brand-color-light: rgb(125, 109, 158);
+  --skin-care-primary: rgba(32, 22, 49, 1);
+  --star-color: #f1c0a4;
+  --skin-care-message-bar-background: rgba(237, 234, 240, 1);
+  --skin-care-secondary: rgba(32, 22, 49, 0.54);
+  --skin-care-search-outline: rgba(32, 22, 49, 0.12);
+  --icon-red: rgba(230, 89, 89, 1);
+  --icon-green: rgba(110, 176, 101, 1);
+  --icon-orange: rgba(232, 140, 70, 1);
+  --background-color: #f5f4f6;
+  --font-family: 'DM Sans', sans-serif;
+  --screenshot-button-color: #{$screenshot-button-color};
+  --screenshot-button-hover-color: #{color.scale(
+      $screenshot-button-color,
+      $lightness: -10%,
+      $space: oklch
+    )};
+  --undo-button-color: #{$undo-button-color};
+  --undo-button-hover-color: #{color.scale(
+      $undo-button-color,
+      $lightness: -10%,
+      $space: oklch
+    )};
+
+  height: 100%;
+  background-color: var(--background-color);
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  font-size: 15px;
+  color: var(--skin-care-primary);
+
+  @include mat.icon-button-overrides(
+    (
+      ripple-color: rgb(78, 58, 118, 0.24),
+    )
+  );
+}
+
+body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+app-root {
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  display: block;
+}
+
+.dm-sans-400 {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+}
+
+.dm-sans-300 {
+  font-family: var(--font-family);
+  font-weight: 300;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+}
+
+.dm-sans-200 {
+  font-family: var(--font-family);
+  font-weight: 200;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+}
