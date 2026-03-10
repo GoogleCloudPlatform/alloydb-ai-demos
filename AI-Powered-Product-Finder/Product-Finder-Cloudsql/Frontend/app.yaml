@@ -1,0 +1,11 @@
+runtime: nodejs20
+env: standard
+service: dotengagesearchcloudsqldemo
+instance_class: F4_1G
+
+env_variables:
+  NODE_ENV: production
+
+handlers:
+  - url: /.*
+    script: auto

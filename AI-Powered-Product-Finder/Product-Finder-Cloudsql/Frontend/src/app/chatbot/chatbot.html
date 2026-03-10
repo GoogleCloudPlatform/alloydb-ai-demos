@@ -1,0 +1,244 @@
+<div id="copilot-chat" #hostRoot>
+  <div class="chat-floating" aria-live="polite">
+
+    <div class="help-label" aria-hidden="true"></div>
+    <div class="help-bubble" *ngIf="showHelpBubble" (click)="onHelpBubbleClick($event)" role="button" tabindex="0">
+      <span class="cloud-top" aria-hidden="true"></span>
+      Need help? Start a chat
+    </div>
+
+    <button id="copilot-toggle" class="chat-toggle" (click)="onToggleClick($event)" [attr.aria-expanded]="isOpen"
+      aria-controls="copilot-panel" aria-label="Open chat" type="button" [attr.title]="'Open chat (Ctrl+K)'">
+      <span class="toggle-badge" *ngIf="unreadCount > 0" aria-hidden="true">{{ unreadCount }}</span>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="40" height="40" role="img"
+        aria-label="Robot icon purple background rounded">
+        <defs>
+          <clipPath id="rounded-viewport">
+            <rect x="0" y="0" width="64" height="64" rx="8" ry="8" />
+          </clipPath>
+        </defs>
+        <g clip-path="url(#rounded-viewport)">
+          <rect x="0" y="0" width="64" height="64" fill="#6750A4" />
+          <rect x="12" y="12" width="40" height="30" rx="6" fill="#FFFFFF" />
+          <circle cx="24" cy="27" r="3" fill="#6750A4" />
+          <circle cx="40" cy="27" r="3" fill="#6750A4" />
+          <line x1="32" y1="12" x2="32" y2="4" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" />
+          <circle cx="32" cy="4" r="2" fill="#FFFFFF" />
+          <rect x="24" y="34" width="16" height="4" rx="2" fill="#6750A4" />
+          <rect x="18" y="42" width="28" height="14" rx="4" fill="#FFFFFF" />
+        </g>
+      </svg>
+    </button>
+
+    <div id="copilot-panel" class="chat-panel" *ngIf="isOpen" [class.minimized]="isMinimized" role="dialog"
+      aria-label="Shopping assistant" aria-modal="false" aria-labelledby="copilot-title">
+      <div class="chat-header" role="banner">
+        <div class="chat-title" id="copilot-title">
+          <span>MCP ShopBot</span>
+        </div>
+
+        <div class="chat-controls" role="group" aria-label="Chat controls">
+          <button class="chat-minimize" (click)="toggleMinimize($event)"
+            [attr.title]="isMinimized ? 'Maximize' : 'Minimize'" type="button"
+            [attr.aria-label]="isMinimized ? 'Maximize' : 'Minimize'">
+            <ng-container *ngIf="isMinimized; else minusIcon">▢</ng-container>
+            <ng-template #minusIcon>—</ng-template>
+          </button>
+
+          <button class="chat-close" (click)="close($event)" title="Close" type="button" aria-label="Close">✕</button>
+        </div>
+      </div>
+
+      <div class="chat-messages" #messagesContainer tabindex="0" aria-live="polite" aria-atomic="false">
+
+        <ng-container *ngIf="hasWelcomePair">
+          <div class="welcome-row" role="region" aria-label="Welcome messages">
+            <div class="welcome-card" *ngFor="let wm of welcomePair; trackBy: trackByMessageId">
+              <div class="msg bot" role="article" [attr.data-time]="wm.time">
+                <div class="msg-inner">{{ wm.text }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sample-questions" aria-hidden="false">
+            <h3 class="sample_heading">Suggestions</h3>
+            <ng-container *ngFor="let q of sampleQuestions">
+              <button type="button" class="sample-btn" (click)="selectSample(q)" aria-label="Use sample question">
+                {{ q }}
+              </button>
+            </ng-container>
+          </div>
+        </ng-container>
+
+        <ng-container *ngFor="let m of messages | slice:2; let i = index; trackBy: trackByMessageId">
+          <div class="msg" [ngClass]="m.from" role="article" [class.typing]="m.typing"
+            aria-label="{{ m.from === 'bot' ? 'Assistant message' : 'Your message' }}">
+            <div class="msg-inner" [attr.data-time]="m.time">
+              <ng-container *ngIf="!m.typing; else typingTpl">{{ m.text }}</ng-container>
+              <ng-template #typingTpl>
+                <div class="typing-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+              </ng-template>
+            </div>
+
+            <div *ngIf="m.from === 'bot' && m.products?.length" class="mcp-accordion">
+              <button class="accordion-header" type="button" (click)="m._accordionOpen = !m._accordionOpen"
+                [attr.aria-expanded]="!!m._accordionOpen" [attr.aria-controls]="'accordion-' + m.id">
+                <span>Search Intelligence</span>
+                <span class="accordion-caret">{{ m._accordionOpen ? '▾' : '▸' }}</span>
+              </button>
+              <div [id]="'accordion-' + m.id" class="accordion-body" *ngIf="m._accordionOpen">
+                <ul>
+                  <li>Agent identified core request attributes for processing.</li>
+                  <li>Executed vector search over data using the similarity tool.</li>
+                  <li>Optimized matches to provide tailored suggestions.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <ng-container *ngIf="m.from === 'bot' && m.products?.length">
+            <ul class="products-inline-list" role="list">
+              <li class="products-inline-item product-card-row" *ngFor="let p of m.products; let idx = index"
+                role="button" tabindex="0" (click)="productClick(p)" (keydown.enter)="productClick(p)"
+                [attr.data-index]="idx">
+                <div class="product-card-inline" (click)="$event.stopPropagation()">
+                  <div class="card-left">
+                    <div class="product-image inline" [ngClass]="{'has-image': !!p.hasImage}">
+                      <img *ngIf="p.hasImage" [src]="p.link" [alt]="p.productDisplayName"
+                        (error)="onImageError($event, p)" />
+                      <div *ngIf="!p.hasImage" class="product-placeholder" aria-hidden="true">
+                        <span>{{ initials(p.productDisplayName) }}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="card-right">
+                    <div class="product-name">{{ p.productDisplayName }}</div>
+                    <div class="product-desc" *ngIf="p.description">{{ p.description }}</div>
+
+                    <div class="product-rating" *ngIf="p.rating !== undefined">
+                      <ng-container *ngFor="let s of starArray(p.rating)">
+                        <span class="star" [ngClass]="{'star-empty': s==='empty','star-half': s==='half'}">★</span>
+                      </ng-container>
+                      <span class="rating-value">{{ p.rating }}</span>
+                    </div>
+
+                    <div class="product-pricing">
+                      <div class="price-final">{{ formatDisplayedPrice(p.finalPrice ?? p.unitPrice) }}</div>
+                      <div class="price-original" *ngIf="p.unitPrice !== undefined && p.unitPrice !== null">
+                        <s>{{ formatDisplayedPrice(p.unitPrice) }}</s>
+                      </div>
+                      <div class="discount-badge" *ngIf="p.discount !== undefined && p.discount !== null">
+                        -{{ round(p.discount) }}%
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="card-action">
+                    <button class="view-btn chat-send" (click)="productClick(p); $event.stopPropagation()"
+                      aria-label="Open product">View</button>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </ng-container>
+        </ng-container>
+      </div>
+
+      <div class="inline-loader" *ngIf="isLoading || showMcpNote" aria-hidden="false">
+        <div class="loading-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+
+        <div *ngIf="showMcpNote; else defaultLoaderText" class="mcp-note" role="status" aria-live="polite">
+          MCP tool utilized by agent to generate product suggestions.
+        </div>
+
+        <ng-template #defaultLoaderText>
+          Agent processing request..
+        </ng-template>
+      </div>
+
+      <form class="chat-form" (submit)="send($event)" autocomplete="off" novalidate>
+        <input id="copilot-input" #inputEl class="chat-input" [(ngModel)]="inputText" name="chatInput"
+          [disabled]="isLoading" autocomplete="off" aria-label="Type your message" type="text"
+          placeholder="Ask for product suggestions" />
+
+        <button type="submit" class="chat-send" [disabled]="isLoading" title="Send message" aria-label="Send message">
+          Send
+        </button>
+
+        <button type="button" class="chat-send reset-btn" (click)="resetChat()" [disabled]="isLoading"
+          title="Reset chat" aria-label="Reset chat">
+          Reset
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="confetti-layer" aria-hidden="true"></div>
+
+  <div class="product-modal-backdrop" *ngIf="showProductModal" role="presentation" (click)="closeProductModal()">
+    <div class="product-modal" role="dialog" aria-modal="true" aria-labelledby="product-modal-title"
+      (click)="$event.stopPropagation()" tabindex="-1">
+      <header class="product-modal-header">
+        <span id="product-modal-title" style="font-size:20px;font-weight:500;">
+          {{ selectedProduct?.productDisplayName }}
+        </span>
+      <button id="product-modal-close" class="chat-close" (click)="closeProductModal()" aria-label="Close product details">✕</button>
+      </header>
+
+      <div class="product-modal-body">
+        <div class="modal-left">
+          <div class="product-image modal">
+            <img *ngIf="selectedProduct?.hasImage" [src]="selectedProduct?.link"
+              [alt]="selectedProduct?.productDisplayName" (error)="onImageError($event, selectedProduct)" />
+            <div *ngIf="!selectedProduct?.hasImage" class="product-placeholder" aria-hidden="true">
+              <span>{{ initials(selectedProduct?.productDisplayName) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-right">
+          <p class="product-desc" *ngIf="selectedProduct?.description">{{ selectedProduct?.description }}</p>
+
+          <!-- Modal rating row: larger, clearer stars and numeric value -->
+          <div class="modal-rating" *ngIf="selectedProduct?.rating !== undefined">
+            <div class="modal-stars" aria-hidden="true">
+              <ng-container *ngFor="let s of starArray(selectedProduct?.rating ?? 0)">
+                <span class="star" [ngClass]="{'star-empty': s==='empty','star-half': s==='half'}">★</span>
+              </ng-container>
+            </div>
+            <div class="modal-rating-meta">
+              <span class="rating-value-large">{{ selectedProduct?.rating }}</span>
+
+              <span class="rating-count" *ngIf="selectedProduct?.mcpConfidence !== undefined">
+                • confidence {{ round((selectedProduct?.mcpConfidence ?? 0) * 100) }}%
+              </span>
+            </div>
+          </div>
+
+
+          <div class="product-pricing modal-pricing">
+            <div class="price-final">{{ formatDisplayedPrice(selectedProduct?.finalPrice ?? selectedProduct?.unitPrice)
+              }}</div>
+            <div class="price-original"
+              *ngIf="selectedProduct?.unitPrice !== undefined && selectedProduct?.unitPrice !== null">
+              <s>{{ formatDisplayedPrice(selectedProduct?.unitPrice) }}</s>
+            </div>
+            <div class="discount-badge"
+              *ngIf="selectedProduct?.discount !== undefined && selectedProduct?.discount !== null">
+              -{{ round(selectedProduct?.discount) }}%
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button class="view-btn view-btn-modal disabled" type="button" aria-label="Out of stock"
+              aria-disabled="true" disabled>
+              Out of stock
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
