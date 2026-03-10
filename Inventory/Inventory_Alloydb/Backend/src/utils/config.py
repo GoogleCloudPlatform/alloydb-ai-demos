@@ -12,7 +12,6 @@ REGION = os.getenv("REGION")
 
 # ---------- Service Account Credentials ----------
 GOOGLE_APPLICATION_CREDENTIALS = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-# GOOGLE_APPLICATION_CREDENTIALS="/home/bhanumathi_munuswamy/Inventory Replenishment/inventory-management-alloydb-app/key.json"
 
 # ---------- Vertex AI ----------
 PROJECT_ID = os.getenv("PROJECT_ID")
