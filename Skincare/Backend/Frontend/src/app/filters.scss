@@ -1,0 +1,202 @@
+// @use 'third_party/javascript/angular_components/material' as mat;
+
+@use '@angular/material' as mat;
+@include mat.core();
+.filters {
+  display: flex;
+  gap: 10px;
+
+  @include mat.select-overrides(
+    (
+      placeholder-text-color: var(--skin-care-secondary),
+      enabled-trigger-text-color: var(--skin-care-primary),
+      trigger-text-font: var(--font-family),
+      trigger-text-size: 15px,
+      trigger-text-tracking: normal,
+      trigger-text-weight: normal,
+    )
+  );
+
+  @include mat.form-field-overrides(
+    (
+      container-height: 36px,
+      container-vertical-padding: 6px,
+      outlined-container-shape: 8px,
+      outlined-outline-color: var(--skin-care-search-outline),
+      outlined-hover-outline-color: var(--skin-care-search-outline),
+      outlined-focus-outline-color: var(--brand-color-light),
+      outlined-outline-width: 1px,
+      outlined-focus-outline-width: 1px,
+    )
+  );
+  flex-flow: row wrap;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.filter-container {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 10px;
+}
+
+::ng-deep .filters-panel {
+  @include mat.option-overrides(
+    (
+      label-text-font: var(--font-family),
+      label-text-size: 15px,
+      label-text-color: var(--skin-care-primary),
+      label-text-tracking: normal,
+      label-text-weight: 500,
+    )
+  );
+
+  @include mat.pseudo-checkbox-overrides(
+    (
+      full-selected-icon-color: var(--brand-color),
+    )
+  );
+  border-radius: 8px;
+}
+
+::ng-deep .filters-panel.mat-mdc-select-panel {
+  border-radius: 8px !important;
+}
+
+.filters mat-form-field {
+  flex: 0 1 auto;
+}
+
+.select-trigger {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  gap: 4px;
+}
+
+::ng-deep .filters .mat-mdc-text-field-wrapper::after {
+  position: absolute;
+  content: '';
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: white;
+  border-radius: 8px;
+  z-index: -1;
+}
+
+::ng-deep .filters .mdc-text-field--outlined {
+  padding-right: 10px;
+  padding-left: 10px;
+}
+
+.search-personalized-toggle {
+  margin-right: 0;
+  --checked-color: var(--skin-care-secondary);
+}
+
+.search-personalized-toggle.checked {
+  --checked-color: var(--skin-care-primary);
+}
+
+::ng-deep .search-personalized-toggle .mat-internal-form-field > label {
+  padding-left: 8px;
+}
+
+::ng-deep
+  .is-personalized
+  > mat-slide-toggle.search-personalized-toggle.mat-mdc-slide-toggle {
+  @include mat.slide-toggle-overrides(
+    (
+      label-text-color: var(--checked-color),
+      label-text-font: var(--font-family),
+      label-text-size: 15px,
+      label-text-line-height: 24px,
+
+      selected-handle-color: var(--brand-color),
+      selected-focus-state-layer-color: var(--brand-color),
+      selected-hover-state-layer-color: var(--brand-color),
+      selected-pressed-state-layer-color: var(--brand-color),
+      selected-track-color: var(--brand-color-light),
+      selected-pressed-track-color: var(--brand-color-light),
+      selected-hover-track-color: var(--brand-color-light),
+      selected-focus-track-color: var(--brand-color-light),
+      selected-focus-handle-color: var(--brand-color),
+      selected-hover-handle-color: var(--brand-color),
+      selected-pressed-handle-color: var(--brand-color),
+    )
+  );
+}
+
+.is-personalized {
+  border: 1px solid var(--skin-care-search-outline);
+  border-radius: 8px;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+}
+
+.circle-counter {
+  visibility: hidden;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  flex: 0 0 22px;
+  align-items: center;
+  border-radius: 12px;
+  background-color: var(--skin-care-secondary);
+  color: white;
+  box-sizing: border-box;
+  justify-content: center;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+}
+
+.circle-counter.visible {
+  visibility: visible;
+}
+
+::ng-deep .filters .mat-mdc-select-value {
+  width: auto;
+  overflow: inherit;
+  text-overflow: inherit;
+  white-space: inherit;
+  margin-right: 4px;
+}
+::ng-deep .filters .mat-mdc-form-field-infix {
+  width: auto;
+}
+
+::ng-deep .filters .mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
+
+::ng-deep div.mat-mdc-select-panel.filters-panel {
+  width: auto;
+  min-width: 226px;
+}
+
+.clear-button {
+  @include mat.icon-button-overrides(
+    (
+      state-layer-size: 36px,
+      icon-color: var(--skin-care-primary),
+    )
+  );
+  padding: calc((36px - 24px) / 2);
+}
+
+.clear-button[disabled] {
+  @include mat.icon-button-overrides(
+    (
+      icon-color: var(--skin-care-secondary),
+    )
+  );
+}
