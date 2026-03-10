@@ -1,0 +1,101 @@
+<header class="header">
+  <div class="header__logo">
+    <img src="/assets/images/New_logo.svg" alt="logo" />
+  </div>
+</header>
+
+<div class="app">
+  <main class="container">
+    <!-- Section: Meet Alex -->
+    <section class="section section-hero">
+      <div class="section-content">
+        <h2 class="section-title">Emma, Trend-Savvy Shopper</h2>
+        <p class="section-body">
+          Meet Emma, she loves fashion but hates wasting time scrolling through endless product lists. She wants to find
+          the perfect outfit quickly—whether it’s a chic blazer or something that matches her mood. Her goal? A search
+          experience that understands her style, not just keywords. </p>
+      </div>
+
+      <div class="section-art" aria-hidden="true">
+        <img class="section-art__img" src="assets/images/1pana.png" alt="Illustration: Meet Alex" width="391"
+          height="250" />
+      </div>
+    </section>
+
+    <!-- Section: Forecasting Fog (image left, content right) -->
+    <section class="section section-copy">
+      <div class="section-art">
+        <img class="section-art__img" src="assets/images/2pana.png" alt="Forecasting illustration" width="480"
+          height="360" />
+      </div>
+
+      <div class="section-content">
+        <h2 class="section-title">Lost in the Scroll: When Search Misses the Mark</h2>
+        <p class="section-body">
+        Today’s e-commerce search feels broken. Semantic intent is lost, hybrid relevance is missing, and natural language queries like ‘Show me a summer dress under $100’ often fail. The result? Frustration and abandoned carts
+       </p>
+      </div>
+    </section>
+
+    <!-- Section: Clear Skies + CTA -->
+    <section class="section section-feature">
+      <div class="section-content">
+        <h2 class="section-title">Fashion Meets Intelligence: AI-Powered Product Discovery</h2>
+        <p class="section-body">
+          Enter the AI-Powered Product Finder—built on AlloyDB for PostgreSQL and Cloud SQL. This web-based application
+          transforms product discovery with semantic search, hybrid relevance scoring, and natural language-to-SQL
+          conversion. It’s where fashion meets intelligence. </p>
+        <br>
+        <br>
+
+        <button class="cta-btn cta-primary" type="button" (click)="navigateDemo()"
+          style="background-color:#6750A4;color:white">Experience the Demo</button>
+      </div>
+
+      <div class="demo-card">
+        <div class="demo-frame">
+          <img class="demo-image" src="assets/images/3pana.png" alt="Solution preview" width="912" height="200" />
+        </div>
+      </div>
+    </section>
+
+
+
+    <!-- Section: Journey (info panel centered) -->
+    <section class="section section-center">
+      <h2 class="section-title center" style="text-align: center;">The Journey of Emma</h2>
+      <p class="section-body center" style="text-align: center;">
+        Now, let’s step into Emma’s world. Her journey is effortless: she types ‘Show me a red cocktail dress under
+        $150’—and AI does the rest. Behind the scenes, AlloyDB retrieves semantically similar products using vector
+        embeddings, applies hybrid scoring with ScaNN and GIN indexes, converts her query into SQL, and even summarizes
+        results. Emma gets exactly what she wants—fast, relevant, and personalized. </p>
+
+      <div class="info-panel info-panel--center" aria-hidden="true">
+        <div class="info-panel__content">
+          <img src="assets/images/4pana.svg" alt="Journey steps strip" width="745" height="102" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Section: Explore (blurred background + sharp foreground + centered CTA) -->
+    <section class="section section-center" style="margin-bottom:30px">
+      <h2 class="section-title center" style="text-align: center;">Explore the Application</h2>
+      <p class="section-body center" style="text-align: center;">
+        Let’s explore the application now. You’ll see an elegant e-commerce interface where natural language queries
+        meet AI-powered intelligence. From semantic search to hybrid relevance and instant summaries, this is product
+        discovery reimagined. </p>
+
+      <div class="demo-card demo-card--lg">
+        <div class="demo-frame demo-frame--blur">
+          <!-- blurred background layer -->
+          <img class="demo-bg" src="assets/images/5pana.png" alt="App preview blurred background" width="1154"
+            height="721" />
+
+          <!-- centered CTA -->
+          <button class="cta-btn cta-primary cta-centered" (click)="navigateDemo()" type="button"
+            style="background-color:#6750A4;color:white">Experience the Demo</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
