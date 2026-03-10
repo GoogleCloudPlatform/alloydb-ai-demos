@@ -1,0 +1,76 @@
+@let chatOpen = isChatOpen();
+<button
+    mat-fab
+    #trigger="cdkOverlayOrigin"
+    cdkOverlayOrigin
+    class="chat-button"
+    (click)="toggleChat()"
+    matTooltip="{{chatOpen ? 'Close chat' : 'Open chat'}}">
+  <mat-icon>{{chatOpen ? 'close' : 'smart_assistant'}}</mat-icon>
+</button>
+
+<ng-template
+    cdkConnectedOverlay
+    (backdropClick)="closeChat()"
+    (overlayKeydown)="closeChat($event)"
+    [cdkConnectedOverlayHasBackdrop]="true"
+    [cdkConnectedOverlayDisableClose]="true"
+    [cdkConnectedOverlayBackdropClass]="'cdk-overlay-transparent-backdrop'"
+    [cdkConnectedOverlayOrigin]="trigger"
+    [cdkConnectedOverlayOpen]="chatOpen">
+  <div class="chat-panel" [class.open]="chatOpen">
+    <div class="chat-header">
+      <h2>Cymbal Skincare Assistant</h2>
+      <button class="close-button" mat-icon-button (click)="toggleChat()">
+        <mat-icon class="close-icon">close</mat-icon>
+      </button>
+    </div>
+
+    <div class="chat-messages-scrollarea">
+      <div class="chat-messages" #chatMessages>
+        <app-chat-message
+          *ngFor="let msg of messages()"
+          (viewCode)="viewCodeContent.set($event)"
+          (orderConfirmed)="orderConfirmed($event)"
+          [message]="msg">
+        </app-chat-message>
+        @if (isLoading()) {
+          <mat-spinner [diameter]="16" style="margin: 0 0 0 64px;"></mat-spinner>
+        }
+      </div>
+    </div>
+
+    <mat-form-field appearance="outline" class="chat-input">
+      <div class="chat-input-container">
+        <textarea
+          cdkTextareaAutosize
+          #autosize="cdkTextareaAutosize"
+          cdkAutosizeMinRows="1"
+          cdkAutosizeMaxRows="32"
+          matInput
+          placeholder="Type a message here..."
+          [(ngModel)]="newMessage"
+          (keydown.enter)="sendMessage(); $event.preventDefault(); $event.stopPropagation();">
+        </textarea>
+      </div>
+      <button mat-icon-button class="chat-send-button" (click)="sendMessage()">
+        <mat-icon>send</mat-icon>
+      </button>
+    </mat-form-field>
+  </div>
+  @let viewCode = viewCodeContent();
+  @if (viewCode) {
+    <div class="sql-dialog" #sqlDialog (click)="sqlDialogClicked($event)">
+      <div class="dialog-content" (click)="$event.stopPropagation()">
+        <div class="code-block">
+          <h3>AlloyDB NLA Query</h3>
+          <pre><code [innerHTML]="highlightedNlaQueryHtml()"></code></pre>
+        </div>
+        <div class="code-block">
+          <h3>Generated Query</h3>
+          <pre><code [innerHTML]="highlightedGeneratedQueryHtml()"></code></pre>
+        </div>
+      </div>
+    </div>
+  }
+</ng-template>

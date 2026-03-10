@@ -1,0 +1,265 @@
+// @use 'third_party/javascript/angular_components/material' as mat;
+@use '@angular/material' as mat;
+@include mat.core();
+
+
+// Chat button styles
+.chat-button {
+  position: fixed;
+  bottom: 40px;
+  left: 40px;
+  background-color: var(--brand-color);
+  color: white;
+}
+
+.chat-button.mat-mdc-fab.mat-accent {
+  @include mat.fab-overrides(
+    (
+      hover-state-layer-opacity: 1,
+      state-layer-color: var(--skin-care-primary),
+    )
+  );
+}
+
+// Chat panel styles
+.chat-panel {
+  position: fixed;
+  bottom: 40px;
+  left: 40px;
+  width: 432px;
+  height: 728px;
+  max-height: calc(100% - 80px);
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0px 4px 24px 0px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-flow: column nowrap;
+  transform: translateX(-600px);
+  transition: transform 0.3s ease;
+  z-index: 999;
+}
+
+.chat-panel.open {
+  transform: translateX(0);
+}
+
+.close-button {
+  color: white;
+  @include mat.icon-button-overrides(
+    (
+      ripple-color: rgba(255, 255, 255, 0.2),
+      state-layer-size: 56px,
+    )
+  );
+}
+
+::ng-deep .close-button.mat-mdc-icon-button.mat-mdc-button-base {
+  padding: 16px;
+}
+
+// Adjusted chat header
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--skin-care-primary);
+  border-radius: 8px 8px 0 0;
+  flex: 0 0 auto;
+}
+
+.chat-header h2 {
+  padding: 16px 0 16px 16px;
+  color: #fff;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  margin: 0;
+}
+
+.chat-messages-scrollarea {
+  overflow-y: auto;
+  display: block;
+  flex: 1;
+}
+
+.chat-messages {
+  padding: 0 18px 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background-color: #fafafa;
+  min-height: 100%;
+
+  @include mat.progress-spinner-overrides(
+    (
+      active-indicator-color: var(--brand-color),
+    )
+  );
+}
+
+.chat-messages::before {
+  content: '';
+  width: 100%;
+  flex: 1;
+}
+
+// Adjusted chat input area
+.chat-input {
+  width: calc(100% - 34px);
+  margin: 24px 18px 16px 16px;
+  flex: 0 0 auto;
+}
+
+.chat-input {
+  @include mat.tree-overrides(
+    (
+      node-text-font: var(--font-family),
+    )
+  );
+  @include mat.form-field-overrides(
+    (
+      subscript-text-line-height: normal,
+      container-height: 24px,
+      container-vertical-padding: 0,
+      container-text-font: var(--font-family),
+      container-text-size: 16px,
+      container-text-tracking: auto,
+      container-text-weight: 500,
+      outlined-container-shape: 24px,
+      outlined-outline-width: 1px,
+      outlined-outline-color: var(--skin-care-search-outline),
+      outlined-hover-outline-color: var(--skin-care-search-outline),
+      outlined-focus-outline-color: var(--brand-color-light),
+      outlined-input-text-color: var(--skin-care-primary),
+      outlined-input-text-placeholder-color: var(--skin-care-secondary),
+    )
+  );
+}
+
+.chat-input-container {
+  padding: 12px 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+::ng-deep .chat-input .mat-mdc-form-field-textarea-control {
+  height: 24px;
+}
+
+::ng-deep .chat-input .mdc-text-field--outlined {
+  padding: 0 8px;
+}
+
+::ng-deep .chat-input .mdc-text-field__input::placeholder {
+  font-weight: 400;
+}
+
+::ng-deep .chat-input .mat-mdc-form-field-infix {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+::ng-deep .chat-input .mat-mdc-text-field-wrapper::after {
+  position: absolute;
+  content: '';
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: white;
+  border-radius: 24px;
+  z-index: -1;
+}
+
+// Give the send button proper spacing
+.chat-send-button {
+  @include mat.icon-button-overrides(
+    (
+      state-layer-size: 40px,
+      icon-color: var(--skin-care-secondary),
+    )
+  );
+  padding: calc((40px - 24px) / 2);
+}
+
+// Fix for material form field margin issues
+::ng-deep .chat-input .mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
+
+// Ensure focus states are visible
+::ng-deep .chat-input .mat-mdc-form-field-focus-overlay {
+  background-color: transparent;
+}
+
+.sql-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  display: inline-flex;
+  padding: 20px;
+  z-index: 1000;
+  overflow-y: scroll;
+  box-sizing: border-box;
+}
+
+.dialog-content {
+  width: 750px;
+  padding: 24px;
+  border-radius: 8px;
+  background: #fff;
+  display: flex;
+  flex-flow: column nowrap;
+  gap: 24px;
+  margin: auto;
+  box-sizing: border-box;
+}
+
+pre code {
+  color: rgba(0, 0, 0, 0.87);
+}
+
+::ng-deep .token.keyword {
+  color: #a43f9b;
+}
+
+::ng-deep .token.string {
+  color: #188038;
+}
+
+::ng-deep .token.number {
+  color: #b06001;
+}
+
+::ng-deep .token.boolean {
+  color: #b06001;
+  text-transform: lowercase;
+}
+
+.code-block pre {
+  background-color: #f8f8f8;
+  padding: 16px;
+  margin: 0;
+  font-family: 'DM Mono';
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  white-space: pre-wrap;
+}
+
+.code-block h3 {
+  color: var(--skin-care-primary);
+  font-family: var(--font-family);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  margin: 0 0 12px 0;
+}

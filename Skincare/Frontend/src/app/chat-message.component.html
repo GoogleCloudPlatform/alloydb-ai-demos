@@ -1,0 +1,62 @@
+@let msg = message();
+@let lines = messageLines();
+<div class="message-container" [ngClass]="msg.sender">
+  <div class="message-avatar" [ngClass]="msg.sender">
+    <img class="avatar-img" src={{msg.senderAvatar}} alt="avatar" />
+  </div>
+
+  <div class="message-content">
+    @if (msg.sender === 'bot') {
+      <div class="sender-name">
+        Assistant
+        @if (msg.sqlQuery) {
+          <button matTooltip="View SQL query"
+              mat-icon-button
+              #viewSql
+              class="open-code-button"
+              (click)="openSqlDialog()">
+            <mat-icon class="code-icon">code</mat-icon>
+          </button>
+        }
+      </div>
+      <div class="sender-content">
+        @for (line of lines; track $index) {
+          {{line}}
+          @if ($index < lines.length - 1) { <br /> }
+        }
+      </div>
+    } @else {
+      <div class="message-bubble" [ngClass]="msg.sender">
+        @for (line of lines; track $index) {
+          {{line}}
+          @if ($index < lines.length - 1) { <br /> }
+        }
+      </div>
+    }
+  </div>
+</div>
+@if (msg.sender === 'bot' && msg.tableData) {
+  <div class="table-wrapper">
+    @if (msg.tableData.columns.length > 0 || msg.tableData.rows.length > 0) {
+      <app-data-table [data]="msg.tableData"></app-data-table>
+    } @else {
+      <div class="no-data-message">No results found. Try another question.</div>
+    }
+  </div>
+}
+
+@if (msg.sender === 'bot' && msg.orderDetails) {
+  <button
+      class="order-button"
+      mat-raised-button
+      [disabled]="msg.orderDetails.status !== 'CONFIRMATION_REQUIRED'"
+      (click)="orderConfirmed.emit(msg.orderDetails)">
+    @if (msg.orderDetails.status === 'CONFIRMATION_REQUIRED') {
+      Confirm order
+    } @else if (msg.orderDetails.status === 'CONFIRMING') {
+      Confirming...
+    } @else if (msg.orderDetails.status === 'CONFIRMED') {
+      Order confirmed
+    }
+  </button>
+}

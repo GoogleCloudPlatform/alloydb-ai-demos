@@ -1,0 +1,7 @@
+runtime: nodejs20
+instance_class: F1
+service: dotengageskincaredemo
+env: standard
+handlers:
+  - url: /.*
+    script: auto

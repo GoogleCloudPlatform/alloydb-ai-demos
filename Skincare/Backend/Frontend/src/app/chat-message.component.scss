@@ -1,0 +1,158 @@
+// @use 'third_party/javascript/angular_components/material' as mat;
+@use '@angular/material' as mat;
+@include mat.core();
+
+.message-container {
+  display: flex;
+  width: 100%;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+}
+
+.message-content {
+  flex: 1 0 0;
+  position: relative;
+}
+
+.message-bubble {
+  padding: 12px;
+  border-radius: 8px;
+  color: var(--skin-care-primary);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  background-color: var(--skin-care-message-bar-background);
+  overflow-wrap: anywhere;
+}
+
+.message-text {
+  word-wrap: break-word;
+}
+
+.sender-content {
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  color: var(--skin-care-primary);
+}
+
+.sender-name {
+  color: var(--skin-care-secondary);
+  font-family: 'DM Sans';
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+// Give the send button proper spacing.
+.open-code-button {
+  @include mat.icon-button-overrides(
+    (
+      state-layer-size: 36px,
+      icon-color: var(--skin-care-secondary),
+    )
+  );
+  padding: 8px;
+  line-height: 1;
+  margin-top: -8px;
+  margin-bottom: -8px;
+}
+
+.code-icon {
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+}
+
+// Avatar styling
+.message-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 16px 0 0;
+  flex: 0 0 48px;
+}
+
+.message-avatar.user {
+  background-color: transparent;
+}
+
+.message-avatar.bot {
+  background-color: rgba(241, 241, 241, 1);
+}
+
+.bot .avatar-img {
+  width: 33px;
+  object-fit: contain;
+}
+
+.user .avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.table-wrapper {
+  position: relative;
+  width: 100%;
+  margin-top: 16px;
+  box-sizing: border-box;
+  border: 1px solid var(--skin-care-search-outline);
+  border-radius: 8px;
+}
+
+::ng-deep .table-wrapper .mdc-data-table__cell {
+  padding: 0 12px;
+}
+
+::ng-deep .table-wrapper .mdc-data-table__header-cell {
+  padding: 0 12px;
+}
+
+.sql-info-container {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+}
+
+.no-data-message {
+  padding: 12px;
+  font-style: italic;
+  color: var(--skin-care-secondary);
+}
+
+.order-button {
+  margin-left: 64px;
+  margin-top: 12px;
+
+  @include mat.button-overrides(
+    (
+      filled-container-color: var(--brand-color),
+      filled-label-text-color: white,
+    )
+  );
+
+  @include mat.button-overrides(
+    (
+      protected-container-shape: 4px,
+      protected-container-color: var(--brand-color),
+      protected-label-text-color: white,
+      protected-label-text-font: var(--font-family),
+      protected-label-text-size: 16px,
+      protected-label-text-weight: 500,
+      protected-label-text-tracking: normal,
+    )
+  );
+}

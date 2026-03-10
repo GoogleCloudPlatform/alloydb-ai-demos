@@ -1,0 +1,291 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<div class="app">
+  <div class="brand-bar">
+    <img class="brand-logo" [src]="logoUrl" />
+    @let profile = menuProfile();
+    @let open = menuOpen();
+    <img #trigger="cdkOverlayOrigin"
+        cdkOverlayOrigin
+        role="button"
+        tabindex="0"
+        (click)="toggleMenu()"
+        (keydown.enter)="toggleMenu(); $event.preventDefault();"
+        (keydown.space)="toggleMenu(); $event.preventDefault();"
+        [class]="open ? 'profile-img open' : 'profile-img'"
+        src={{profile.imageUrl}} />
+    <ng-template
+        cdkConnectedOverlay
+        (backdropClick)="closeMenu()"
+        (overlayKeydown)="closeMenu($event)"
+        [cdkConnectedOverlayHasBackdrop]="true"
+        [cdkConnectedOverlayBackdropClass]="'cdk-overlay-transparent-backdrop'"
+        [cdkConnectedOverlayOrigin]="trigger"
+        [cdkConnectedOverlayOpen]="open">
+      <ul class="profile-info">
+        <li class="name">{{profile.name}}</li>
+        <li class="categories">
+          <div>Preferences</div>
+          <ul class="bullets">
+            @for (preference of profile.preferences; track preference.typ) {
+              <li>
+                @if (preference.icon) {
+                  <mat-icon
+                      matTooltip={{preference.icon.tooltip}}
+                      fontSet="google-symbols">
+                    {{preference.icon.name}}
+                  </mat-icon>
+                }
+                {{filterLabel(preference.typ)}}
+              </li>
+            }
+          </ul>
+        </li>
+        <li class="categories">
+          <div>Skin type</div>
+          <ul class="bullets">
+            @for (skinType of profile.skinTypes; track skinType.typ) {
+              <li>
+                @if (skinType.icon) {
+                  <mat-icon
+                      matTooltip={{skinType.icon.tooltip}}
+                      fontSet="google-symbols">
+                    {{skinType.icon.name}}
+                  </mat-icon>
+                }
+                {{filterLabel(skinType.typ)}}
+              </li>
+            }
+          </ul>
+        </li>
+      </ul>
+    </ng-template>
+  </div>
+  <div class="app-body">
+    <h1 class="app-title dm-sans-200">
+      The Skincare Company for You <span style="font-size: 32px;">🫰</span> <br/>
+      From Everyday Essentials to Luxury Indulgences
+    </h1>
+    <div class="search-bar">
+      <form class="search-form" (ngSubmit)="search(filters())">
+        <mat-form-field appearance="outline" class="search-input">
+          <input matInput name="query" [(ngModel)]="query" placeholder="Search for your next glow up" />
+          <div class="separator"></div>
+          <button mat-button type="button" class="analyze-container" (click)="analyzeMySkin()">
+            @if (waitingForAnalysis()) {
+              <mat-spinner class="analyze-spinner" [diameter]="20"></mat-spinner>
+            } @else {
+              <mat-icon fontSet="google-symbols">familiar_face_and_zone</mat-icon>
+            }
+            <span class="analyze-label">Analyze my skin</span>
+          </button>
+        </mat-form-field>
+      </form>
+    </div>
+    <app-filters [profilePresets]="profilePresets()" (filtersChanged)="onFiltersChanged($event)" #filtersTemplate>
+    </app-filters>
+    @let analysis = analysisResult();
+    @if (analysis)  {
+      <div class="analysis-result">
+        <div class="image-container">
+          <img class="analysis-image" [src]="analysis.image" />
+        </div>
+        <div class="text-container">
+          <div class="text-container-top">
+            <div class="analysis-title">
+              <div>Analysis</div>
+              <button class="close-button-2" mat-icon-button (click)="closeAnalysis()" matTooltip="Clear analysis">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+            @if (analysis.analysis) {
+              <div class="analysis-content">
+                {{analysis.analysis}}
+                </div>
+            }
+          </div>
+          @if (analysis.priority) {
+            <div class="analysis-content">
+              {{analysis.priority}}
+            </div>
+          }
+          @if ((analysis.analysis && analysis.analysis !== "please wait...") || analysis.priority) {
+            <div class="analysis-disclaimer">
+              This image-based analysis may not be fully accurate; Please consult a skincare specialist for a professional evaluation.
+            </div>
+          }
+        </div>
+      </div>
+    }
+    <div class="search-summary dm-sans-400">
+      <div class="summary-label">
+        @let searchQuery = appliedQuery();
+        @if (searchQuery) {
+          Top relevant products for "{{searchQuery}}"
+        } @else {
+          Top products
+        }
+        @let hasPBanner = displayPreferenceFilterBanner();
+        @let hasSTBanner = displaySkinTypeFilterBanner();
+        @if (hasPBanner || hasSTBanner) {
+        <div class="summary-filters">
+         filtered by
+         @if (hasSTBanner) {
+           skin type:
+           @let sFilters = skinTypeFilters();
+           @for (skinType of sFilters; track skinType) {
+             <span class="personalized-keyword">
+               {{filterLabel(skinType)}}@if ($index < sFilters.length - 1 || hasPBanner) {, }
+             </span>
+           }
+         }
+         @if (hasPBanner) {
+           @if (hasSTBanner) {
+             Preferences:
+           } @else {
+             preferences:
+           }
+           @let pFilters = preferenceFilters();
+           @for (preference of pFilters; track preference) {
+             <span class="personalized-keyword">
+               {{filterLabel(preference)}}@if ($index < pFilters.length - 1) {, }
+             </span>
+           }
+         }
+        </div>
+        }
+      </div>
+      <div class="summary-content">
+        @let responseLength = response()?.length;
+        @if (responseLength) {
+          Showing {{ responseLength }} products
+        }
+      </div>
+    </div>
+
+    @if (isLoading()) {
+      <mat-spinner [diameter]="50" style="margin: 0 auto;"></mat-spinner>
+    }
+    <div class="cards">
+      @for (row of response(); track $index) {
+        <div class="fade-in product-card">
+          <div class="product-image-container">
+            <img
+              class="product-image"
+              style="opacity: 0;"
+              onload="this.style.opacity = 1"
+              [src]="`https://storage.googleapis.com/io_demo_product_image/${row.product_id}.jpg`" />
+            <div class="product-icons">
+              @if (row.is_vegan) {
+                <mat-icon matTooltip="Vegan friendly" style="color: var(--icon-green)" fontSet="google-symbols">psychiatry</mat-icon>
+              }
+              @if (row.cruelty_free) {
+                <mat-icon matTooltip="Cruelty free" style="color: var(--icon-red)" fontSet="google-symbols">cruelty_free</mat-icon>
+              }
+              @if (row.works_for_oily_skin) {
+                <mat-icon matTooltip="Works for oily skin" style="color: var(--icon-orange)" fontSet="google-symbols">water_drop</mat-icon>
+              }
+            </div>
+          </div>
+          <div class="product-info">
+            <div class="product-title">
+              {{ row.product_name }}
+            </div>
+            <div class="product-rating">
+              <div class="star-rating">
+                @for (spec of starIcons(row.rating); track $index) {
+                  <mat-icon class="small" fontSet="google-symbols" class={{spec.className}}>{{spec.name}}</mat-icon>
+                }
+              </div>
+              <div class="star-rating-count">
+                {{ row.reviews }}
+              </div>
+            </div>
+            <div class="product-price">
+              ${{ row.price_usd }}
+            </div>
+          </div>
+        </div>
+      }
+      <!-- Ghost cards, to align the cards correctly on the last row. -->
+      <div class="product-card-ghost"></div>
+<div class="product-card-ghost"></div>
+      <div class="product-card-ghost"></div>
+    </div>
+    <div class="license-text">Built on AlloyDB using Kaggle dataset: <a
+        href="https://www.kaggle.com/datasets/nadyinky/sephora-products-and-skincare-reviews"
+        target="_blank">Sephora Products and Skincare Reviews</a> by <a
+        href="https://www.kaggle.com/nadyinky"
+        target="_blank">nadyinky</a> under <a
+        href="https://creativecommons.org/licenses/by/4.0/" target="_blank">creative commons license</a></div>
+  </div>
+  @let showAnalyzeMySkin = isAnalyzing();
+  @if (showAnalyzeMySkin) {
+    <div class="analyze-backdrop" #analyzeBackdrop (click)="analyzeBackdropClicked($event)">
+      @let webError = webcamError();
+      <div class="dialog-content-analysis" (click)="$event.stopPropagation()">
+        <div class="selected-photo">
+          @if (isCameraOpen()) {
+            <video class="selected-media" #analyzeVideo></video>
+            <button class="camera-button" mat-fab [disabled]="!!webError" (click)="takeScreenshot()" matTooltip="Take a photo">
+              <mat-icon>camera_alt</mat-icon>
+            </button>
+          } @else {
+            <img class="selected-media" [src]="selectedPhoto()" style="opacity: 0;" onload="this.style.opacity = 1" />
+            <button class="undo-button" mat-fab (click)="openCamera()" matTooltip="Undo">
+              <mat-icon>undo</mat-icon>
+            </button>
+          }
+
+          @if (webError && (isCameraOpen() || isWebshotOpen())) {
+            <div class="webcam-error">
+              <div>{{webError}}</div>
+              <button
+                  class="cancel-button"
+                  mat-button
+                  (click)="openCamera(true)">
+                Retry
+              </button>
+            </div>
+          }
+        </div>
+        <div class="carousel-container">
+          <div class="open-webcam" [class.is-selected]="isCameraOpen() || isWebshotOpen()" (click)="openCamera()" >
+            <mat-icon>camera_alt</mat-icon>
+          </div>
+          @for (samplePhoto of skinSamples(); track $index) {
+            <div class="sample-photo" [class.is-selected]="samplePhoto.isSelected" (click)="selectSamplePhoto($index)">
+              <img class="sample-photo-img" [src]="samplePhoto.src" style="opacity: 0;" onload="this.style.opacity = 1" />
+            </div>
+          }
+        </div>
+        <div class="analyze-actions">
+          <button
+              class="analyze-button"
+              mat-raised-button
+              [disabled]="waitingForAnalysis()"
+              (click)="uploadPhoto()">
+            @if (!waitingForAnalysis()) {
+              <span class="analyze-label">Analyze image</span>
+            } @else {
+              @if (waitingForAnalysis()) {
+                <mat-spinner class="analyze-spinner" [diameter]="20"></mat-spinner>
+              }
+              <span class="analyze-label">Analyzing...</span>
+            }
+          </button>
+          <button
+              class="cancel-button"
+              mat-button
+              [disabled]="false"
+              (click)="cancel()">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+ <!-- Chatbox components -->
+  <app-chat [profile]="profile"></app-chat>
+  <!-- End of chatbox components -->
+</div>
+<router-outlet></router-outlet>

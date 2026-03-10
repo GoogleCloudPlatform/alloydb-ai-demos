@@ -1,0 +1,42 @@
+{
+  "name": "skin-care-app",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "node server.js",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test"
+  },
+  "private": true,
+  "packageManager": "npm@11.10.1",
+  "dependencies": {
+    "@angular/animations": "^21.2.0",
+    "@angular/cdk": "^21.2.0",
+    "@angular/common": "^21.2.0",
+    "@angular/compiler": "^21.2.0",
+    "@angular/core": "^21.2.0",
+    "@angular/forms": "^21.2.0",
+    "@angular/material": "^21.2.0",
+    "@angular/platform-browser": "^21.2.0",
+    "@angular/router": "^21.2.0",
+    "express": "^5.2.1",
+    "lodash": "^4.17.23",
+    "prismjs": "^1.30.0",
+    "rxjs": "~7.8.0",
+    "serve": "^14.2.6",
+    "sql-formatter": "^15.7.2",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^21.2.1",
+    "@angular/cli": "^21.2.1",
+    "@angular/compiler-cli": "^21.2.0",
+    "@types/lodash": "^4.17.24",
+    "@types/prismjs": "^1.26.6",
+    "jsdom": "^28.0.0",
+    "prettier": "^3.8.1",
+    "typescript": "~5.9.2",
+    "vitest": "^4.0.8"
+  }
+}

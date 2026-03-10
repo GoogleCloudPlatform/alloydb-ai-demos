@@ -1,0 +1,106 @@
+<div class="filters">
+  <div class="filter-container">
+    <div class="is-personalized">
+      <mat-slide-toggle class="search-personalized-toggle" [class.checked]="isPersonalized()"
+                (change)="onPersonalizedChange($event)"
+                [hideIcon]="true"
+                [checked]="isPersonalized()">Apply preferences</mat-slide-toggle>
+    </div>
+    <mat-form-field appearance="outline">
+      <mat-select [formControl]="preferencesControl" [multiple]="true" placeholder="Attributes" panelClass="filters-panel">
+        <mat-select-trigger class="select-trigger">
+          Attributes
+          <div class="circle-counter" [class.visible]="preferencesControl.value.length > 0">
+            {{preferencesControl.value.length}}
+          </div>
+        </mat-select-trigger>
+        <mat-option value="prefvegan">Vegan</mat-option>
+        <mat-option value="prefmineraloilfree">Without mineral oils</mat-option>
+        <mat-option value="prefparabenfree">Paraben-free</mat-option>
+        <mat-option value="prefworksforoilyskin">Works for oily skin</mat-option>
+        <mat-option value="prefcrueltyfree">Cruelty-free</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-select [formControl]="skinTypeControl" [multiple]="true" placeholder="Skin Type" panelClass="filters-panel">
+        <mat-select-trigger class="select-trigger">
+          Skin Type
+          <div class="circle-counter" [class.visible]="skinTypeControl.value.length > 0">
+            {{skinTypeControl.value.length}}
+          </div>
+        </mat-select-trigger>
+        <mat-option value="skincombination">Combination</mat-option>
+        <mat-option value="skindry">Dry</mat-option>
+        <mat-option value="skinnormal">Normal</mat-option>
+        <mat-option value="skinoily">Oily</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-select [formControl]="secondaryCategoryControl" [multiple]="true" placeholder="Category" panelClass="filters-panel">
+        <mat-select-trigger class="select-trigger">
+          Category
+          <div class="circle-counter" [class.visible]="secondaryCategoryControl.value.length > 0">
+            {{secondaryCategoryControl.value.length}}
+          </div>
+        </mat-select-trigger>
+        <mat-option value="catcleansers">Cleansers</mat-option>
+        <mat-option value="cateyecare">Eye Care</mat-option>
+        <mat-option value="cathightechtools">High Tech Tools</mat-option>
+        <mat-option value="catlipbalmstreatments">Lip Balms & Treatments</mat-option>
+        <mat-option value="catmasks">Masks</mat-option>
+        <mat-option value="catminisize">Mini Size</mat-option>
+        <mat-option value="catmoisturizers">Moisturizers</mat-option>
+        <mat-option value="catselftanners">Self Tanners</mat-option>
+        <mat-option value="catshopbyconcern">Shop by Concern</mat-option>
+        <mat-option value="catsunscreen">Sunscreen</mat-option>
+        <mat-option value="cattreatments">Treatments</mat-option>
+        <mat-option value="catvaluegiftsets">Value & Gift Sets</mat-option>
+        <mat-option value="catwellness">Wellness</mat-option>
+        <mat-option value="catother">Other</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-select [formControl]="ratingControl" [multiple]="true" placeholder="Rating" panelClass="filters-panel">
+        <mat-select-trigger class="select-trigger">
+          Rating
+          <div class="circle-counter" [class.visible]="ratingControl.value.length > 0">
+            {{ratingControl.value.length}}
+          </div>
+        </mat-select-trigger>
+        <mat-option value="rating1to2">1-2 Stars</mat-option>
+        <mat-option value="rating2to3">2-3 Stars</mat-option>
+        <mat-option value="rating3to4">3-4 Stars</mat-option>
+        <mat-option value="rating4to5plus">4-5+ Stars</mat-option>
+      </mat-select>
+      </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-select [formControl]="priceRangeControl" [multiple]="true" placeholder="Price" panelClass="filters-panel">
+        <mat-select-trigger class="select-trigger">
+          Price
+          <div class="circle-counter" [class.visible]="priceRangeControl.value.length > 0">
+            {{priceRangeControl.value.length}}
+          </div>
+        </mat-select-trigger>
+        <mat-option value="price0to25">Less than $25</mat-option>
+        <mat-option value="price25to75">$25 - $75</mat-option>
+        <mat-option value="price75to100">$75 - $100</mat-option>
+        <mat-option value="price100to150">$100 - $150</mat-option>
+        <mat-option value="price150to200">$150 - $200</mat-option>
+        <mat-option value="pricegt200">More than $200</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <button matTooltip="Clear filters" mat-icon-button class="clear-button" [disabled]="!hasFilters()" (click)="clearFilters()">
+    <mat-icon>
+      @if (hasFilters()) {
+        filter_alt_off
+      } @else {
+        filter_alt
+      }
+    </mat-icon>
+  </button>
+</div>

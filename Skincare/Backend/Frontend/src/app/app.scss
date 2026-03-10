@@ -1,0 +1,800 @@
+// @use 'third_party/javascript/angular_components/material' as mat;
+@use '@angular/material' as mat;
+
+
+@include mat.core();
+.app {
+  box-sizing: border-box;
+  border: none;
+  padding: 32px 40px 40px 40px;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.app-body {
+  width: 894px;
+  max-width: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
+
+  @include mat.progress-spinner-overrides(
+    (
+      active-indicator-color: var(--brand-color),
+    )
+  );
+}
+
+.app-title {
+  text-align: center;
+  color: var(--brand-color);
+  font-size: 36px;
+  line-height: normal;
+  margin: 0 0 24px 0;
+  padding: 0 0 6px 0;
+}
+
+.search-bar {
+  margin-bottom: 0;
+}
+
+.search-input {
+  width: 100%;
+  margin-right: 0;
+}
+
+.search-input {
+  @include mat.tree-overrides(
+    (
+      node-text-font: var(--font-family),
+    )
+  );
+
+  @include mat.form-field-overrides(
+    (
+      subscript-text-line-height: normal,
+      outlined-container-shape: 24px,
+      container-height: 50px,
+      container-vertical-padding: 0px,
+      outlined-outline-width: 2px,
+      outlined-focus-outline-width: 2px,
+      outlined-outline-color: var(--skin-care-search-outline),
+      outlined-hover-outline-color: var(--skin-care-search-outline),
+      outlined-focus-outline-color: var(--brand-color-light),
+      container-text-font: var(--font-family),
+      container-text-size: 15px,
+      outlined-input-text-color: var(--skin-care-primary),
+      outlined-input-text-placeholder-color: var(--skin-care-secondary),
+      container-text-tracking: auto,
+    )
+  );
+}
+
+::ng-deep .search-input .mat-mdc-form-field-infix {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+::ng-deep .search-input .mat-mdc-text-field-wrapper::after {
+  position: absolute;
+  content: '';
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: white;
+  border-radius: 24px;
+  z-index: -1;
+}
+
+.search-summary {
+  margin-bottom: 16px;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  font-size: 16px;
+}
+
+.product-card {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
+  align-items: stretch;
+  width: 290px;
+  height: 418px;
+  box-sizing: border-box;
+  background-color: #fff;
+}
+
+.product-image-container {
+  width: 290px;
+  height: 290px;
+  position: relative;
+}
+
+.product-image {
+  width: inherit;
+  height: inherit;
+  transition: opacity 0.6s;
+}
+
+.product-icons {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+
+.product-card-ghost {
+  width: 290px;
+  height: 0px;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.product-card:hover {
+  box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.12);
+}
+
+.product-info {
+  font-size: 15px;
+  padding: 16px;
+}
+
+.product-title {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: var(--skin-care-primary);
+  line-height: normal;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+}
+
+.product-rating {
+  font-size: 15px;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.star-rating {
+  display: flex;
+  margin-right: 5px;
+}
+
+.product-star-full,
+.product-star-half,
+.product-star-empty {
+  &.mat-icon.small {
+    color: var(--star-color);
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+  }
+}
+
+.product-star-full {
+  font-variation-settings: 'FILL' 1;
+}
+
+.product-star-half {
+  font-variation-settings: 'FILL' 1;
+}
+
+.product-star-empty {
+  font-variation-settings: 'FILL' 0;
+}
+
+.star-rating-count {
+  color: var(--skin-care-secondary);
+  font-weight: 500;
+}
+
+.product-price {
+  color: var(--skin-care-secondary);
+  font-weight: 500;
+}
+
+.product-icons {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.product-icons .mat-icon {
+  font-size: 20px;
+  height: 20px;
+  width: 20px;
+}
+
+.fade-in {
+  opacity: 1;
+  animation-name: fadeInOpacity;
+  animation-iteration-count: 1;
+  animation-timing-function: ease-in;
+  animation-duration: 0.3s;
+}
+
+@keyframes fadeInOpacity {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+mat-form-field,
+mat-slide-toggle {
+  margin-right: 10px;
+}
+
+mat-icon.small {
+  height: 24px;
+  width: 24px;
+  font-size: 24px;
+}
+
+.profile-img {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  aspect-ratio: 1;
+  border: 4px solid transparent;
+  box-sizing: content-box;
+  cursor: pointer;
+}
+.profile-img.open {
+  border: 4px solid var(--skin-care-search-outline);
+}
+
+.personalized-banner {
+  background-color: #f1f1f1;
+  border-radius: 10px;
+  padding: 15px 20px;
+  margin-bottom: 16px;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+.personalized-keyword {
+  font-weight: 600;
+}
+
+.brand-bar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.brand-logo {
+  height: 52px;
+}
+
+.cards {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: flex-start;
+  align-content: center;
+  gap: 12px;
+}
+
+.profile-info {
+  background-color: var(--skin-care-primary);
+  padding: 20px 0 5px 0;
+  color: #fff;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  width: 221px;
+}
+
+.profile-info li {
+  list-style: none;
+}
+
+.profile-info .name {
+  padding: 0px 20px;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 500;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  margin-bottom: 15px;
+}
+
+.profile-info .categories {
+  padding: 0 20px;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.profile-info .categories > div {
+  display: inherit;
+}
+
+.profile-info .categories > .bullets {
+  padding: 0;
+  margin-top: 2px;
+  font-weight: 400;
+}
+
+.profile-info .categories > .bullets > li {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.profile-info .categories > .bullets mat-icon {
+  font-size: 20px;
+  height: 20px;
+  width: 20px;
+  margin-right: 4px;
+}
+
+.profile-info .switch {
+  padding: 15px 20px;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  margin-top: 15px;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+}
+
+.profile-info {
+  .switch {
+    &::after:focus {
+      content: '';
+      position: absolute;
+      background-color: rgba(255, 255, 255, 0.12);
+      width: 100%;
+      left: 0;
+      top: 0;
+      bottom: 0;
+    }
+  }
+}
+
+.license-text {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  box-sizing: border-box;
+  width: 214px;
+  padding: 8px;
+  font-size: 13px;
+  color: var(--skin-care-secondary);
+
+  border-radius: 8px;
+  background-color: var(--background-color);
+  text-align: right;
+}
+
+.license-text a:visited {
+  color: var(--skin-care-secondary);
+}
+
+.license-text a:link {
+  color: var(--skin-care-secondary);
+}
+
+.analyze-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  display: inline-flex;
+  padding: 20px;
+  z-index: 1000;
+  overflow-y: scroll;
+  box-sizing: border-box;
+}
+
+.dialog-content {
+  width: 800px;
+  padding: 0px;
+  border-radius: 8px;
+  background: #fff;
+  display: flex;
+  flex-flow: column nowrap;
+  margin: auto;
+  gap: 1px;
+  box-sizing: border-box;
+}
+
+.dialog-content-analysis {
+  width: 760px;
+  padding: 0px;
+  border-radius: 8px;
+  background: #fff;
+  display: flex;
+  flex-flow: column nowrap;
+  margin: auto;
+  gap: 1px;
+  box-sizing: border-box;
+}
+
+.selected-photo {
+  width: 760px;
+  height: 70vh;
+  max-height: 560px;
+  object-fit: cover;
+  object-position: top;
+  position: relative;
+}
+
+.carousel-container {
+  display: flex;
+  flex-flow: row nowrap;
+  gap: 1px;
+  width: 100%;
+  justify-content: stretch;
+}
+
+.open-webcam {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sample-photo,
+.open-webcam {
+  flex: 1;
+  positposition: relative;
+  &.is-selected::after {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    content: '';
+    border: 2px solid #57a0ee;
+  }
+}
+
+.sample-photo {
+  cursor: pointer;
+}
+
+.sample-photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.6s;
+}
+
+.selected-media {
+  background-color: #dadada;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 8px 8px 0 0;
+  transition: opacity 0.6s;
+}
+
+.analyze-actions {
+  padding: 20px 24px;
+  display: flex;
+  gap: 20px;
+}
+
+.analyze-button {
+  display: flex;
+  flex-flow: row nowrap;
+  gap: 8px;
+  @include mat.button-overrides(
+    (
+      filled-container-color: var(--brand-color),
+      filled-label-text-color: white,
+    )
+  );
+
+  @include mat.button-overrides(
+    (
+      protected-container-shape: 4px,
+      protected-container-color: var(--brand-color),
+      protected-label-text-color: white,
+      protected-label-text-font: var(--font-family),
+      protected-label-text-size: 16px,
+      protected-label-text-weight: 500,
+      protected-label-text-tracking: normal,
+    )
+  );
+
+  .analyze-spinner {
+    display: block;
+    position: relative;
+    vertical-align: top;
+    margin-right: 8px;
+    @include mat.progress-spinner-overrides(
+      (
+        active-indicator-color: var(--brand-color),
+      )
+    );
+  }
+
+  .analyze-label {
+    display: block;
+  }
+}
+
+::ng-deep .analyze-button {
+  &.mat-mdc-button {
+    min-width: unset;
+  }
+  .mdc-button__label {
+    display: flex;
+    align-items: center;
+    flex-flow: row nowrap;
+  }
+}
+
+.cancel-button {
+  @include mat.button-overrides(
+    (
+      text-container-shape: 4px,
+      text-label-text-color: var(--skin-care-primary),
+      text-label-text-font: var(--font-family),
+      text-label-text-size: 16px,
+      text-label-text-weight: 500,
+      text-label-text-tracking: normal,
+    )
+  );
+}
+
+.search-input {
+  .separator {
+    width: 1px;
+    height: 26px;
+    background-color: var(--skin-care-search-outline);
+    margin-right: 8px;
+  }
+}
+
+.analyze-container {
+  display: flex;
+  flex-flow: row nowrap;
+  gap: 8px;
+
+  @include mat.button-overrides(
+    (
+      text-container-shape: 4px,
+      text-label-text-color: var(--skin-care-primary),
+      text-label-text-font: var(--font-family),
+      text-label-text-size: 15px,
+      text-label-text-weight: 400,
+      text-label-text-tracking: normal,
+    )
+  );
+
+  .mat-icon {
+    font-size: 20px;
+    height: 20px;
+    width: 20px;
+    margin: 0;
+  }
+
+  .analyze-spinner {
+    display: block;
+    position: relative;
+    vertical-align: top;
+    margin-right: 8px;
+  }
+
+  .analyze-label {
+    display: block;
+  }
+}
+
+::ng-deep .analyze-container {
+  &.mat-mdc-button {
+    min-width: unset;
+  }
+  .mdc-button__label {
+    display: flex;
+    align-items: center;
+    flex-flow: row nowrap;
+  }
+}
+
+.analysis-result {
+  display: flex;
+  padding: 24px;
+  align-items: flex-start;
+  gap: 16px;
+  border-radius: 16px;
+  background-color: var(--skin-care-message-bar-background);
+  margin-bottom: 24px;
+}
+
+.text-container {
+  color: var(--skin-care-primary);
+  font-family: var(--font-family);
+  font-size: 16px;
+  font-style: normal;
+  line-height: normal;
+  display: flex;
+  flex-flow: column nowrap;
+  gap: 16px;
+}
+
+.text-container-top {
+  color: var(--skin-care-primary);
+  font-family: var(--font-family);
+  font-size: 16px;
+  font-style: normal;
+  line-height: normal;
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.analysis-title {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+
+  .mat-icon {
+    font-size: 20px;
+    height: 20px;
+    width: 20px;
+    margin: 0;
+    display: block;
+  }
+
+  .close-button-2 {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    --mat-icon-button-state-layer-size: 36px;
+    --mat-icon-button-icon-color: var(--skin-care-primary);
+    padding: 8px;
+  }
+}
+
+.analysis-content {
+  font-weight: 400;
+}
+
+.image-container {
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.analysis-image {
+  width: 200px;
+  object-fit: contain;
+}
+
+.analysis-disclaimer {
+  color: var(--skin-care-secondary);
+  font-family: var(--font-family);
+  font-size: 13px;
+  font-style: normal;
+  line-height: normal;
+}
+
+.analyze-label {
+  white-space: nowrap;
+}
+
+.camera-button {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  .mat-icon {
+    font-size: 24px;
+    height: 24px;
+    width: 24px;
+    margin: 0;
+    font-variation-settings: 'FILL' 1;
+  }
+  &.mat-mdc-fab.mat-accent {
+    @include mat.fab-overrides(
+      (
+        // hover-state-layer-opacity: 1,
+        foreground-color: #fff,
+        small-foreground-color: #fff,
+        ripple-color: rgba(255, 255, 255, 0.1),
+        container-color: var(--screenshot-button-color),
+        state-layer-color: var(--screenshot-button-color)
+      )
+    );
+
+    &:hover,
+    :focus,
+    :active {
+      @include mat.fab-overrides(
+        (
+          container-color: var(--screenshot-button-hover-color),
+          state-layer-color: var(--screenshot-button-hover-color),
+        )
+      );
+    }
+  }
+}
+
+.undo-button {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  .mat-icon {
+    font-size: 24px;
+    height: 24px;
+    width: 24px;
+    margin: 0;
+  }
+  &.mat-mdc-fab.mat-accent {
+    @include mat.fab-overrides(
+      (
+        // hover-state-layer-opacity: 1,
+        foreground-color: #fff,
+        small-foreground-color: #fff,
+        ripple-color: rgba(255, 255, 255, 0.1),
+        container-color: var(--undo-button-color),
+        state-layer-color: var(--undo-button-color)
+      )
+    );
+    &:hover,
+    :focus,
+    :active {
+      @include mat.fab-overrides(
+        (
+          container-color: var(--undo-button-hover-color),
+          state-layer-color: var(--undo-button-hover-color),
+        )
+      );
+    }
+  }
+}
+
+.summary-filters {
+  color: var(--skin-care-secondary);
+}
+
+.summary-content {
+  flex: 0 0 auto;
+}
+
+.summary-label {
+  flex: 1;
+}
+
+.webcam-error {
+  top: 50%;
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  justify-content: center;
+}
