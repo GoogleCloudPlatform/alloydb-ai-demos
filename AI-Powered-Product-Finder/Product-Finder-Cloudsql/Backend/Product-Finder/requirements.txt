@@ -1,0 +1,10 @@
+cloud-sql-python-connector==1.18.5
+fastapi==0.121.2
+pg8000==1.31.5
+psycopg2-binary==2.9.10
+pydantic==2.9.2
+python-dotenv==1.1.1
+SQLAlchemy==2.0.44
+uvicorn==0.35.0
+google-cloud-aiplatform==1.71.1
+sqlparse==0.5.3
