@@ -7,3 +7,4 @@ pydantic==2.9.2
 python-dotenv==1.1.1
 SQLAlchemy==2.0.44
 uvicorn==0.35.0
+sqlparse==0.5.3
