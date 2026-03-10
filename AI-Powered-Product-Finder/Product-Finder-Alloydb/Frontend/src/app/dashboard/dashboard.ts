@@ -112,6 +112,9 @@ export class Dashboard implements OnInit, OnDestroy {
   // **NEW**: store the last filtered results so pagination always slices from the same array
   private lastFiltered: ProductModel[] = [];
 
+  // NEW: show the "Click search again..." message after filter changes
+  showClickSearchMessage = false;
+
   constructor(private svc: ProductService, private cdr: ChangeDetectorRef, private router: Router) { }
 
   ngOnInit(): void {
@@ -330,6 +333,7 @@ export class Dashboard implements OnInit, OnDestroy {
     this.page = 1;
 
     if (!this.validateBeforeSearch()) return;
+    this.showClickSearchMessage = false; // user explicitly searched
     this.performMultiSearch();
   }
 
@@ -341,6 +345,11 @@ export class Dashboard implements OnInit, OnDestroy {
       this.showPagination = true;
       this.page = 1;
       this.applyFilter();
+      this.cdr.markForCheck();
+    }
+    // typing in the search input should hide the "click search" hint
+    if (this.showClickSearchMessage) {
+      this.showClickSearchMessage = false;
       this.cdr.markForCheck();
     }
   }
@@ -400,6 +409,19 @@ export class Dashboard implements OnInit, OnDestroy {
               extractArray(res.data) ??
               extractArray(res.payload) ??
               [];
+
+            // NEW: if the response is valid but contains an empty details array, show "No Products found"
+            if (Array.isArray(details) && details.length === 0) {
+              this.error = 'No Products found';
+              this.clearListings();
+              this.rawRemoteResults = {};
+              this.showPagination = true;
+              this.searchResultsVisible = false;
+              this.remoteProducts = [];
+              this.showClickSearchMessage = false; // hide the "click search" hint
+              this.cdr.markForCheck();
+              return;
+            }
 
             if (!res) {
               this.error = 'Empty response from search service';
@@ -472,6 +494,9 @@ export class Dashboard implements OnInit, OnDestroy {
             this.showPagination = false;
             this.page = 1;
 
+            // hide the "click search" hint because we have results (or at least a response)
+            this.showClickSearchMessage = false;
+
             // store filtered results and update pagination state
             this.lastFiltered = [...this.remoteProducts];
             this.newTotal = this.lastFiltered.length;
@@ -526,6 +551,7 @@ export class Dashboard implements OnInit, OnDestroy {
       this.showPagination = true;
       this.searchResultsVisible = false;
       this.remoteProducts = [];
+      this.showClickSearchMessage = false; // local search executed
 
       try {
         const record = this.createSearchRecord([...this.displayed], filtersForSave, { search_type: 'local' });
@@ -546,6 +572,7 @@ export class Dashboard implements OnInit, OnDestroy {
     this.showPagination = true;
     this.page = 1;
     this.perPage = 6;
+    this.showClickSearchMessage = false; // reset
     this.applyFilter();
     this.cdr.markForCheck();
   }
@@ -554,12 +581,14 @@ export class Dashboard implements OnInit, OnDestroy {
   onBrandChange(value: string): void {
     this.selectedBrand = value || '';
     this.page = 1;
+    this.showClickSearchMessage = true;
     this.applyFilter();
   }
 
   onCategoryChange(value: string): void {
     this.selectedCategory = value || '';
     this.page = 1;
+    this.showClickSearchMessage = true;
     this.applyFilter();
   }
 
@@ -567,6 +596,7 @@ export class Dashboard implements OnInit, OnDestroy {
     const v = Number(value) || 0;
     this.selectedRating = v;
     this.page = 1;
+    this.showClickSearchMessage = true;
     this.applyFilter();
   }
 
@@ -574,6 +604,7 @@ export class Dashboard implements OnInit, OnDestroy {
     const v = (value || 'none') as PriceSort;
     this.priceSort = v;
     this.page = 1;
+    this.showClickSearchMessage = true;
     this.applyFilter();
   }
 
@@ -602,6 +633,7 @@ export class Dashboard implements OnInit, OnDestroy {
     if (apply) {
       this.priceRangeMin = Math.round(Math.max(this.priceLimitMin, Math.min(this.tempMin, this.tempMax)));
       this.priceRangeMax = Math.round(Math.min(this.priceLimitMax, Math.max(this.tempMax, this.tempMin)));
+      this.showClickSearchMessage = true; // <-- show message after price change
       this.applyFilter();
     } else {
       this.tempMin = this.priceRangeMin;
@@ -869,71 +901,102 @@ export class Dashboard implements OnInit, OnDestroy {
       'nl_to_sql': 'SQL filter query powered by AlloyDB Data Agent',
       nltosql: 'SQL filter query powered by AlloyDB Data Agent',
       'ai.if': 'AI.IF',
-      aiif: 'AI.IF',
     };
-
-    this.infoModalMode = map[type] ?? (this.searchResponseMeta.search_type || 'Search Results');
-    this.infoModalTitle = '';
-    this.infoModalSubtitle = this.searchResponseMeta.reason || '';
-    this.infoModalSql = this.searchResponseMeta.sql_command || '';
-    this.infoModalOpen = true;
-    this.cdr.markForCheck();
+    // rest of method omitted in original snippet
   }
 
-  onViewQuery(event: Event): void {
-    event.preventDefault();
-    if (this.total > 0) {
-      this.openSearchMetaPopup();
-    }
-  }
-
-  // ---------- Local storage helpers ----------
-  private loadSavedSearches(): any[] {
+  private createSearchRecord(products: ProductModel[], filters: any, meta: any): any {
     try {
-      const raw = localStorage.getItem(this.STORAGE_KEY);
-      if (!raw) return [];
-      return JSON.parse(raw) || [];
+      const record = {
+        id: `s-${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        query: this.query || '',
+        filters: filters || {},
+        meta: meta || {},
+        count: products?.length ?? 0,
+        products: (products || []).slice(0, 50).map((p) => ({
+          id: (p as any).id ?? '',
+          name: p.productDisplayName ?? '',
+          brand: (p as any).brand ?? '',
+          finalPrice: Number(p.finalPrice ?? p.unitPrice ?? 0),
+        })),
+      };
+      return record;
     } catch (e) {
-      console.warn('Failed to read saved searches', e);
-      return [];
+      return null;
     }
   }
 
   private saveSearchRecord(record: any): void {
+    if (!record) return;
     try {
-      const list = this.loadSavedSearches();
-      list.unshift(record);
-      const trimmed = list.slice(0, 25);
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(trimmed));
+      const raw = localStorage.getItem(this.STORAGE_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      arr.unshift(record);
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(arr.slice(0, 20)));
     } catch (e) {
-      console.warn('Failed to save search', e);
+      console.warn('Failed to save search record', e);
     }
   }
 
-  private createSearchRecord(results: ProductModel[], filters: any, meta: any): any {
-    const shallow = (results || []).map((r) => {
-      return {
-        id: (r as any).id ?? '',
-        name: r.productDisplayName ?? '',
-        link: (r as any).link ?? '',
-        unitPrice: Number((r as any).unitPrice ?? 0),
-        finalPrice: Number((r as any).finalPrice ?? 0),
-        brand: (r as any).brand ?? '',
-        rating: Number((r as any).rating ?? 0),
-      };
-    });
-
-    return {
-      timestamp: new Date().toISOString(),
-      query: this.query || '',
-      filters: filters || {},
-      meta: meta || {},
-      results: shallow,
+  onViewQuery(event: Event): void {
+    event.preventDefault();
+    const type = (this.searchResponseMeta.search_type || '').toString().toLowerCase();
+    const map: Record<string, string> = {
+      vector: 'Vector Search',
+      hybrid: 'Hybrid Search',
+      'nl_to_sql': 'SQL filter query powered by AlloyDB Data Agent',
+      nltosql: 'SQL filter query powered by AlloyDB Data Agent',
+      'ai.if': 'AI.IF',
     };
+
+    // Prefer SQL from the latest search response meta
+    const sqlFromMeta = (this.searchResponseMeta?.sql_command || '').toString().trim();
+    if (sqlFromMeta) {
+
+      this.infoModalTitle = `${this.infoModalMode ? this.infoModalMode.toString().toUpperCase() : 'Info'} Search`;
+      this.infoModalSubtitle = this.searchResponseMeta.reason || '';
+      this.infoModalSql = sqlFromMeta;
+      this.infoModalOpen = true;
+      this.cdr.markForCheck();
+      setTimeout(() => {
+        const el = document.querySelector('.info-modal') as HTMLElement | null;
+        if (el) el.focus();
+      }, 0);
+      return;
+    }
+
+    // Fallback: look for sql_command in rawRemoteResults
+    const keys = Object.keys(this.rawRemoteResults || {});
+    for (const k of keys) {
+      const rr = this.rawRemoteResults[k] as RemoteResultSet | undefined;
+      const sql = (rr?.sql_command || '').toString().trim();
+      if (sql) {
+        this.infoModalMode = k;
+        this.infoModalTitle = `${k.toString().toUpperCase()} Search`;
+        this.infoModalSubtitle = rr?.summary || '';
+        this.infoModalSql = sql;
+        this.infoModalOpen = true;
+        this.cdr.markForCheck();
+        setTimeout(() => {
+          const el = document.querySelector('.info-modal') as HTMLElement | null;
+          if (el) el.focus();
+        }, 0);
+        return;
+      }
+    }
+
+    // Nothing available — show a friendly message in the modal
+    this.infoModalMode = '';
+    this.infoModalTitle = 'Info Search';
+    this.infoModalSubtitle = '';
+    this.infoModalSql = 'No query available for this search.';
+    this.infoModalOpen = true;
+    this.cdr.markForCheck();
+    setTimeout(() => {
+      const el = document.querySelector('.info-modal') as HTMLElement | null;
+      if (el) el.focus();
+    }, 0);
   }
 
-  private tryApplySavedResults(): boolean {
-    // Not implemented in this iteration; return false to always apply live filters.
-    return false;
-  }
 }

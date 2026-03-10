@@ -1,8 +1,8 @@
-# AI‑Powered Product Finder in AlloyDB
+# AI‑Powered Product Finder 
 ## Data Preprocessing 
 
 ## Purpose of This Script
-This script prepares product data for the AI-powered Product Finder Demo Application in AlloyDB.
+This script prepares product data for the AI-powered Product Finder Demo Application in AlloyDB for PostgreSQL/Cloud SQL for PostgreSQL/Cloud SQL for MySQL.
 
 - Loads styles.csv and images.csv from Google Cloud Storage (GCS)
 - Cleans the raw dataset

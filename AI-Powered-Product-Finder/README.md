@@ -1,4 +1,4 @@
-**README.md — Complete Environment Setup Guide**
+**Complete Environment Setup Guide**
 
 **Introduction:**
 

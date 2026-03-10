@@ -100,7 +100,8 @@
           View query
         </a>
 
-        <span class="search-results-count"> Showing {{ getDisplayStart() }} - {{ getDisplayEnd() }} of {{ newTotal }}</span>
+        <span class="search-results-count"> Showing {{ getDisplayStart() }} - {{ getDisplayEnd() }} of {{ newTotal
+          }}</span>
       </div>
     </div>
   </section>
@@ -146,7 +147,9 @@
   </section>
 
   <!-- No-results message -->
-<div *ngIf="error && !loading" class="no-results-message" role="status" aria-live="polite"> {{ error }} </div> <div *ngIf="!error && !displayed.length && !loading" class="no-results-message" role="status" aria-live="polite"> No products match your current filters. Try adjusting the brand or category, or widening the price range, then click Search. </div>
+  <div *ngIf="error && !loading" class="no-results-message" role="status" aria-live="polite"> {{ error }} </div>
+  <div *ngIf="!error && !displayed.length && !loading" class="no-results-message" role="status" aria-live="polite">
+    Click search again to get results! </div>
 
 
 
@@ -242,21 +245,27 @@
   </div>
 
   <!-- Place paginator at the end of the container (not fixed) -->
-  <div *ngIf="useNewPagination && !loading && newTotal > 0" class="new-paginator" role="navigation" aria-label="Product pagination">
+  <div *ngIf="useNewPagination && !loading && newTotal > 0" class="new-paginator" role="navigation"
+    aria-label="Product pagination">
     <div class="new-paginator__left">
-      <button class="filter" type="button" (click)="newGoToPage(1)" [disabled]="newPage === 1" aria-label="First page">« First</button>
-      <button class="filter" type="button" (click)="newPrev()" [disabled]="newPage === 1" aria-label="Previous page">‹ Prev</button>
+      <button class="filter" type="button" (click)="newGoToPage(1)" [disabled]="newPage === 1" aria-label="First page">«
+        First</button>
+      <button class="filter" type="button" (click)="newPrev()" [disabled]="newPage === 1" aria-label="Previous page">‹
+        Prev</button>
     </div>
 
     <div class="new-paginator__pages" aria-hidden="false">
-      <button class="filter" *ngFor="let p of newPages" type="button" [class.active]="p === newPage" (click)="newGoToPage(p)" [attr.aria-current]="p === newPage ? 'page' : null">
+      <button class="filter" *ngFor="let p of newPages" type="button" [class.active]="p === newPage"
+        (click)="newGoToPage(p)" [attr.aria-current]="p === newPage ? 'page' : null">
         {{ p }}
       </button>
     </div>
 
     <div class="new-paginator__right">
-      <button class="filter" type="button" (click)="newNext()" [disabled]="newPage === newTotalPages" aria-label="Next page">Next ›</button>
-      <button class="filter" type="button" (click)="newGoToPage(newTotalPages)" [disabled]="newPage === newTotalPages" aria-label="Last page">Last »</button>
+      <button class="filter" type="button" (click)="newNext()" [disabled]="newPage === newTotalPages"
+        aria-label="Next page">Next ›</button>
+      <button class="filter" type="button" (click)="newGoToPage(newTotalPages)" [disabled]="newPage === newTotalPages"
+        aria-label="Last page">Last »</button>
 
       <label style="margin-left:12px; display:inline-flex; align-items:center; gap:8px;">
         <span style="font-size:0.9rem; color:#49454F;">Per page</span>

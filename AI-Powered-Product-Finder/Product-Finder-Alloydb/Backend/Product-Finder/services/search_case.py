@@ -12,7 +12,7 @@ import traceback
 import google.auth
 import google.auth.transport.requests
 from google.oauth2 import service_account
-
+import sqlparse
 import requests
 from config import (
     ALLOYDB_SCHEMA_NAME,
@@ -292,7 +292,13 @@ class AlloyDbSearchTypes:
         compiled = query.compile(
             dialect=self.engine.dialect, compile_kwargs={"literal_binds": True}
         )
-        sql_string = str(compiled)
+        raw_sql = str(compiled)
+        # Format the string
+        formatted_sql = sqlparse.format(
+            raw_sql, 
+            reindent=True, 
+        )
+        sql_string = formatted_sql
 
         try:
             with self.engine.connect() as connection:
@@ -451,7 +457,15 @@ class AlloyDbSearchTypes:
         compiled = query.compile(
             dialect=self.engine.dialect, compile_kwargs={"literal_binds": True}
         )
-        sql_string = str(compiled)
+
+        
+        raw_sql = str(compiled)
+        # Format the string
+        formatted_sql = sqlparse.format(
+            raw_sql, 
+            reindent=True, 
+        )
+        sql_string = formatted_sql
 
         try:
             with self.engine.connect() as connection:
@@ -567,16 +581,7 @@ class AlloyDbSearchTypes:
                 # so that the UI gets complete product details to display while preserving filters.
                 rewritten_sql = merge_where_clauses(where_sql, generated_sql)
 
-                base_select_all = """
-                SELECT
-                     productDisplayName,
-                     link,
-                     unitPrice,
-                     discount,
-                     finalPrice,
-                     rating
-                """
-                # Naive swap: replace everything from SELECT to FROM with UI fields.
+                base_select_all = "SELECT productDisplayName, link, unitPrice, discount, finalPrice, rating"               # Naive swap: replace everything from SELECT to FROM with UI fields.
                 # Works when generated SQL is a single SELECT ... FROM ...
                 match_from = re.search(r"\bFROM\b", rewritten_sql, flags=re.IGNORECASE)
                 if match_from:
@@ -591,7 +596,13 @@ class AlloyDbSearchTypes:
                 compiled = query.compile(
                     dialect=self.engine.dialect, compile_kwargs={"literal_binds": True}
                 )
-                sql_string = str(compiled)
+                raw_sql = str(compiled)
+                # Format the string
+                formatted_sql = sqlparse.format(
+                    raw_sql, 
+                    reindent=True, 
+                )
+                sql_string = formatted_sql
                 self.logger.info(f"Executing the query for NL-to-SQL:{sql_string}")
                 rows = connection.execute(query).mappings().all()
 
@@ -754,7 +765,13 @@ class AlloyDbSearchTypes:
         compiled = query.compile(
             dialect=self.engine.dialect, compile_kwargs={"literal_binds": True}
         )
-        sql_string = str(compiled)
+        raw_sql = str(compiled)
+        # Format the string
+        formatted_sql = sqlparse.format(
+            raw_sql, 
+            reindent=True, 
+        )
+        sql_string = formatted_sql
 
         try:
             with self.engine.connect() as connection:
