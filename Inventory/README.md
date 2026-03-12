@@ -36,7 +36,7 @@ Note: VECTOR(d) columns must match the embedding model dimension — d = 768 for
 Note: VECTOR(d) columns must match the embedding model dimension — d = 768 for Vertex textembedding005.  
 - **ScaNN Index** is the recommended vector‑search option at scale, configured with USING scann (...), tuned num_leaves, and optionally max_num_levels = 2, followed by an ANALYZE operation for optimization.  
 - **pgvector (Fallback Option)**: Supports HNSW or IVFFlat indexing using the appropriate operator class (e.g., vector_cosine_ops) and the matching <=> similarity operator.  
--**LangChain Integrations**:  
+- **LangChain Integrations**:  
   - AlloyDBEngine for secure, IAM‑authenticated connection pooling  
   - AlloyDBVectorStore + VertexAIEmbeddings for retrieval workflows  
   - (Optional) SQLDatabaseToolkit for structured SQL interactions  
@@ -374,6 +374,7 @@ Host the build (Cloud Storage + CDN, Firebase Hosting, or NGINX). Set `environme
 - All SQL is parameterized. The backend returns an optional `sql_query` with responses for transparency/debugging.
 
 ---
+
 
 
 
