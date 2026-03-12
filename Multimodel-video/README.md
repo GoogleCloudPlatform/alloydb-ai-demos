@@ -26,14 +26,11 @@ project-root/
 │  ├─ tests/
 │  └─ requirements.txt
 │
-├─ frontend/                  # Angular app (TypeScript)
-│  ├─ src/
-│  ├─ public/
-│  ├─ angular.json
-│  ├─ package.json
-│  ├─ tsconfig.json
-│  ├─ tsconfig.app.json
-│  └─ tsconfig.spec.json
+├─ frontend/                  # Angular app
+│  └─ src/app/
+│     ├─ dashboard/
+│     ├─ journey-page-component/
+│     └─ services/
 │
 ├─ .env.example               # Template (no secrets)
 ├─ .gitignore
@@ -281,6 +278,7 @@ Host the build (Cloud Storage + CDN, Firebase Hosting, or NGINX). Set `environme
 - Prefer **HNSW** indexes; tune `hnsw.ef_search`
 - Start with **1 fps** frame sampling for cost/quality balance
 - Keep media in **GCS**; BYTEA only if compliance/portability required
+
 
 
 
