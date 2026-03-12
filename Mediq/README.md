@@ -1,6 +1,7 @@
 
 # MedIQ Demo Application — Setup Instructions
 
+## Application Overview
 This demo application is designed to provide **quick, accurate clinical insights**. It integrates **comprehensive medical datasets** containing information such as:
 
 - Disease details
@@ -15,6 +16,19 @@ This demo application is designed to provide **quick, accurate clinical insights
 
 Users can query disease‑related information, and the system generates **natural language responses** by aggregating data from structured sources and PDFs. This helps **streamline diagnostic workflows** and **improve patient care**.
 
+**Key Alloy DB Components**: 
+- **AlloyDB for PostgreSQL** (provides the database foundation) 
+- **Embeddings creation** (with google_ml extension) using text-embedding-005 model 
+- **Vector similarity** (with pgvector extension) using cosine similarity 
+- AlloyDB AI Query Operator: **ai.generate** for creating natural language response from search results 
+- **ScaNN** (optional, for large-scale deployments): Prefer ScaNN index with post‑creation ANALYZE when working with very large corpora and if supported in your environment
+  
+The demo combines two distinct data sources: 
+- **Unstructured PDF data** (processed into chunks) 
+- **Structured CSV data** (rows of tabulated information)
+  
+By combining embeddings, semantic retrieval, and response generation inside SQL, the application demonstrates how AlloyDB can unify insights from heterogeneous sources. This is achieved through a Table-Valued Function (TVF), which encapsulates query logic and outputs a reusable set of records. Careful query planning and orchestration ensure that both PDF and CSV data contribute meaningfully to the final natural language summary. 
+ 
 ---
 
 ## Prerequisites
