@@ -188,13 +188,15 @@ export class VideoApiService {
 ```
 
 **Component render snippet**:
-```html
-<div *ngFor="let h of hits">
-  <h4>{{ h.filename }} ({{ h.similarity | number:'1.2-2' }})</h4>
-  <p>Label: {{ h.label }} • Duration: {{ h.duration || '—' }}s</p>
-  <video *ngIf="h.public_url" [src]="h.public_url" controls width="480"></video>
-  <div *ngIf="!h.public_url" class="warn">Not public. Use signed/proxy link.</div>
-</div>
+```@Component({
+  selector: 'app-root',
+  imports: [RouterOutlet],
+  templateUrl: './app.html',
+  styleUrl: './app.scss'
+})
+export class App {
+  protected readonly title = signal('MultiModel');
+}
 ```
 
 ---
@@ -264,6 +266,7 @@ Host the build (Cloud Storage + CDN, Firebase Hosting, or NGINX). Set `environme
 - Prefer **HNSW** indexes; tune `hnsw.ef_search`
 - Start with **1 fps** frame sampling for cost/quality balance
 - Keep media in **GCS**; BYTEA only if compliance/portability required
+
 
 
 
