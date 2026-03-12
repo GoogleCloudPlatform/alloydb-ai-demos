@@ -1,21 +1,53 @@
-**Complete Environment Setup Guide**
+# AI-Powered Product Finder Demo Application
 
-**Introduction:**
+## Application Overview
 
-This repository provides scripts and instructions to deploy the backend infrastructure needed for the **AI‑Powered Product Finder** system across:
+This demo application allows users to explore a fashion product catalog using intelligent search powered by **AlloyDB for PostgreSQL** and **Cloud SQL for PostgreSQL**, **Cloud SQL for MySQL**. It showcases advanced capabilities such as: 
+- Semantic Queries 
+- Hybrid Relevance Scoring (Full-Text Search + Vector Search) 
+- Natural Language-to-SQL Conversion (exclusive to AlloyDB)
+  
+The application demonstrates features like vector embeddings, ScaNN indexing and the AI query operator ai.if (exclusive to AlloyDB) for semantic search. 
 
-*   **AlloyDB**
-*   **Cloud SQL PostgreSQL**
-*   **Cloud SQL MySQL**
+**Key Components Utilized**:
+**AlloyDB for PostgreSQL**:
 
-This solution demonstrates intelligent search on a fashion product catalog using capabilities such as:
+*AI Powered Product Finder*
+- AlloyDB for PostgreSQL as the core database engine. 
+- Create embeddings using the google_ml extension. 
+- Perform vector similarity search through the pgvector extension. 
+- Use the NL to SQL capability via the Data Agents. 
+- Set the google_ml_integration.enable_ai_query_engine flag to true to enable AI.IF. 
+ 
+*MCP Chatbot* 
+- AlloyDB for PostgreSQL: A high-performance, fully managed database engine that provides enterprise-grade scalability and 100% PostgreSQL compatibility. 
+- Embeddings Creation (google_ml): A specialized extension that allows you to generate vector embeddings directly via SQL by calling Vertex AI models. 
+- Vector Similarity (pgvector): An extension that enables storing high-dimensional vectors and performing fast semantic search to find contextually related data. 
+ 
+ 
+**Cloud SQL for PostgreSQL**:
 
-*   Semantic vector queries
-*   Hybrid relevance search (Keyword + Vector search)
-*   Natural‑language‑to‑SQL (AlloyDB exclusive)
-*   ScaNN vector indexing
-*   AI‑powered query operators
+*AI Powered Product Finder*
+- Cloud SQL for PostgreSQL as the primary database platform. 
+- Embeddings creation (using google_ml extension): Enables generating text embeddings directly inside Cloud SQL using built‑in Google ML models. 
+- Vector similarity (using pgvector extension): Provides native vector storage and similarity search capabilities for semantic and AI-driven queries. 
 
+*MCP Chatbot*
+- CloudSQL for PostgreSQL: A high-performance, fully managed database engine that provides enterprise-grade scalability and 100% PostgreSQL compatibility. 
+- Embeddings Creation (google_ml): A specialized extension that allows you to generate vector embeddings directly via SQL by calling Vertex AI models. 
+- Vector Similarity (pgvector): An extension that enables storing high-dimensional vectors and performing fast semantic search to find contextually related data. 
+ 
+**Cloud SQL for MySQL**: 
+
+*AI Powered Product Finder* 
+- Cloud SQL for MySQL as the primary database platform. 
+- Enable the cloudsql_vector flag to allow vector embedding storage and vector similarity search capabilities.
+  
+*MCP Chatbot* 
+- Cloud SQL for MySQL: A high-performance, fully managed database engine that provides enterprise-grade scalability and 100% PostgreSQL compatibility. 
+- Embeddings Creation (google_ml): A specialized extension that allows you to generate vector embeddings directly via SQL by calling Vertex AI models. 
+- Vector Similarity (pgvector): An extension that enables storing high-dimensional vectors and performing fast semantic search to find contextually related data. 
+ 
 The environment setup includes:
 
 *   GCS bucket creation
