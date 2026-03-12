@@ -265,20 +265,3 @@ ecomm\_fashion\_presql\_inst.sh
 *   gcloud config set account "<Account Id>"
 *   gcloud config set project "Project Id"
 
-**Folder Structure:**
-
-alloydb\_gc/  
-└── agentic/  
-└── script/  
-├── agentic\_config.sh  
-├── bucket\_create.sh  
-├── cloudsql\_mysql\_instance\_creation.sh  
-├── cloudsql\_postgres\_instance\_creation.sh  
-├── alloydb\_postgres\_cluster\_creation.sh  
-├── ecomm\_fashion\_mysql\_create\_table.sql  
-├── ecomm\_fashion\_mysql\_create\_ddl.sh  
-├── ecomm\_fashion\_cloudsql\_create\_table.sql  
-├── ecomm\_fashion\_cloudsql\_create\_ddl.sh  
-├── ecomm\_fashion\_wrapper\_ddl.sh  
-├── ecomm\_fashion\_ddl.sql  
-└── (all other scripts)
