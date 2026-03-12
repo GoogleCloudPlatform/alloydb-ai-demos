@@ -1,6 +1,7 @@
 # Intelligent Inventory Replenishment (Vertex AI + AlloyDB/CloudSQL + pgvector)
 
-**Application Overview**: 
+## Application Overview: 
+
 This demo application demonstrates a **Retail Inventory Agent** built using **LangChain**, **AlloyDB**, and **Google Cloud services**. The solution automates inventory replenishment by leveraging real-time signals, structured data, and contextual documents. The agentic workflow utilizes **Retrieval-Augmented Generation (RAG)** and decision logic to generate purchase orders and manage stock levels efficiently. 
  
 **Key AlloyDB Components Utilized**: 
@@ -371,6 +372,7 @@ Host the build (Cloud Storage + CDN, Firebase Hosting, or NGINX). Set `environme
 - All SQL is parameterized. The backend returns an optional `sql_query` with responses for transparency/debugging.
 
 ---
+
 
 
 
