@@ -46,7 +46,9 @@ Note: VECTOR(d) columns must match the embedding model dimension — d = 768 for
   - **Secret Manager** for securely storing non‑IAM secrets  
 
 
-**Key MySQL Components Utilized**:                                                                                                        
+**Key MySQL Components Utilized**:                                                                                           
+
+
 **Inventory Management**:  
 - **MySQL** serves as the primary operational database, maintaining authoritative records for products, stores, stock levels, transactions, suppliers, and purchase orders.    
 - **AlloyDBVectorStore combined with VertexAIEmbeddings** enables RAG‑based retrieval over documents such as supplier notes, seasonal memos, policies, and SOPs, returning results with citations.  
@@ -372,6 +374,7 @@ Host the build (Cloud Storage + CDN, Firebase Hosting, or NGINX). Set `environme
 - All SQL is parameterized. The backend returns an optional `sql_query` with responses for transparency/debugging.
 
 ---
+
 
 
 
