@@ -11,6 +11,7 @@ The application demonstrates features like vector embeddings, ScaNN indexing and
 
 **Key Components Utilized**:
 **AlloyDB for PostgreSQL**:
+
 *AI Powered Product Finder*
 - AlloyDB for PostgreSQL as the core database engine. 
 - Create embeddings using the google_ml extension. 
@@ -25,6 +26,7 @@ The application demonstrates features like vector embeddings, ScaNN indexing and
  
  
 **CloudSQL for PostgreSQL**:
+
 *AI Powered Product Finder*
 - Cloud SQL for PostgreSQL as the primary database platform. 
 - Embeddings creation (using google_ml extension): Enables generating text embeddings directly inside Cloud SQL using built‑in Google ML models. 
@@ -35,7 +37,8 @@ The application demonstrates features like vector embeddings, ScaNN indexing and
 - Embeddings Creation (google_ml): A specialized extension that allows you to generate vector embeddings directly via SQL by calling Vertex AI models. 
 - Vector Similarity (pgvector): An extension that enables storing high-dimensional vectors and performing fast semantic search to find contextually related data. 
  
-**CloudSQL for MySQL**:  
+**CloudSQL for MySQL**: 
+
 *AI Powered Product Finder* 
 - Cloud SQL for MySQL as the primary database platform. 
 - Enable the cloudsql_vector flag to allow vector embedding storage and vector similarity search capabilities.
