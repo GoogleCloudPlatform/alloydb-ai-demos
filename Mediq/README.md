@@ -177,12 +177,14 @@ uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload
 ```
 OpenAPI docs: 
 http://localhost:8080/docs
+
 Endpoints: 
 POST /medIqSearch
 
-## Step 5: Run Frontend
+---
 
-# Run the Frontend (Angular)
+## Step 5: Run Frontend (Angular)
+
 - **Step 5(a) Install deps**
 ```
 cd frontend
@@ -190,6 +192,7 @@ npm ci
 ```
  
 - **Step 5(b) Proxy API for local dev**
+
 Create frontend/proxy.conf.json:
 ```
 {
