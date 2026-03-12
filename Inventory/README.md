@@ -46,8 +46,6 @@ Note: VECTOR(d) columns must match the embedding model dimension — d = 768 for
   - **Secret Manager** for securely storing non‑IAM secrets  
 
 
-  
- 
 **Key MySQL Components Utilized**:                                                                                                        
 **Inventory Management**:  
 - **MySQL** serves as the primary operational database, maintaining authoritative records for products, stores, stock levels, transactions, suppliers, and purchase orders.    
@@ -64,7 +62,7 @@ Note: VECTOR(d) columns must match the embedding model dimension — d = 768 for
   - **Cloud Run** for hosting agent services and workflow endpoints  
   - **Secret Manager** for securely storing non‑IAM secrets 
 
-**Angular Frontend + FastAPI Backend + Batch/Streaming Pipelines**
+## Angular Frontend + FastAPI Backend + Batch/Streaming Pipelines
 
 Plan, simulate, and execute inventory replenishment across stores and warehouses. The system combines
 Vertex AI (forecasting & embeddings) with PostgreSQL (AlloyDB or Cloud SQL) + `pgvector` for similarity search.
@@ -374,6 +372,7 @@ Host the build (Cloud Storage + CDN, Firebase Hosting, or NGINX). Set `environme
 - All SQL is parameterized. The backend returns an optional `sql_query` with responses for transparency/debugging.
 
 ---
+
 
 
 
