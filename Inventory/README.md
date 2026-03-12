@@ -250,16 +250,7 @@ Update `angular.json` → architect > serve > options:
   "proxyConfig": "proxy.conf.json"
 }
 ```
-3) **Environments**
-`frontend/src/environments/environment.ts`:
-```ts
-export const environment = { production: false, apiBase: '/api' };
-```
-`environment.prod.ts`:
-```ts
-export const environment = { production: true, apiBase: 'https://<your-backend-domain>' };
-```
-4) **Start Angular**
+3) **Start Angular**
 ```bash
 npm run start    # or: ng serve
 # http://localhost:4200

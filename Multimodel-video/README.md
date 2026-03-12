@@ -38,14 +38,11 @@ project-root/
 │  ├─ tests/
 │  └─ requirements.txt
 │
-├─ frontend/                  # Angular app (TypeScript)
-│  ├─ src/
-│  ├─ public/
-│  ├─ angular.json
-│  ├─ package.json
-│  ├─ tsconfig.json
-│  ├─ tsconfig.app.json
-│  └─ tsconfig.spec.json
+├─ frontend/                  # Angular app
+│  └─ src/app/
+│     ├─ dashboard/
+│     ├─ journey-page-component/
+│     └─ services/
 │
 ├─ .env.example               # Template (no secrets)
 ├─ .gitignore
@@ -146,23 +143,9 @@ Update `angular.json` → `architect > serve > options`:
 "proxyConfig": "proxy.conf.json"
 ```
 
-### 3) Environments
-`frontend/src/environments/environment.ts`:
-```ts
-export const environment = {
-  production: false,
-  apiBase: '/api'
-};
-```
-`environment.prod.ts`:
-```ts
-export const environment = {
-  production: true,
-  apiBase: 'https://<your-backend-domain>'
-};
-```
 
-### 4) Start Angular
+
+### 3) Start Angular
 ```bash
 npm run start    # or: ng serve
 # http://localhost:4200
@@ -185,7 +168,7 @@ export interface CategoriesDuration {
 }
 ```
 
-**API Service** (`src/app/services/video-api.service.ts`):
+**API Service** **(`src/app/services/video-service.ts`):(example)**
 ```ts
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
@@ -217,13 +200,15 @@ export class VideoApiService {
 ```
 
 **Component render snippet**:
-```html
-<div *ngFor="let h of hits">
-  <h4>{{ h.filename }} ({{ h.similarity | number:'1.2-2' }})</h4>
-  <p>Label: {{ h.label }} • Duration: {{ h.duration || '—' }}s</p>
-  <video *ngIf="h.public_url" [src]="h.public_url" controls width="480"></video>
-  <div *ngIf="!h.public_url" class="warn">Not public. Use signed/proxy link.</div>
-</div>
+```@Component({
+  selector: 'app-root',
+  imports: [RouterOutlet],
+  templateUrl: './app.html',
+  styleUrl: './app.scss'
+})
+export class App {
+  protected readonly title = signal('MultiModel');
+}
 ```
 
 ---
