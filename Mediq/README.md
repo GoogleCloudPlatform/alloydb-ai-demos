@@ -1,5 +1,5 @@
 
-# MedIQ Demo Application — Setup Instructions
+# MedIQ Demo Application
 
 ## Application Overview
 This demo application is designed to provide **quick, accurate clinical insights**. It integrates **comprehensive medical datasets** containing information such as:
