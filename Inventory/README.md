@@ -44,6 +44,8 @@ Note: VECTOR(d) columns must match the embedding model dimension — d = 768 for
 - **Orchestration & Runtime Components** (optional for production):  
   - **Cloud Run** for hosting agent services and workflow endpoints  
   - **Secret Manager** for securely storing non‑IAM secrets  
+
+
   
  
 **Key MySQL Components Utilized**:                                                                                                        
@@ -372,6 +374,7 @@ Host the build (Cloud Storage + CDN, Firebase Hosting, or NGINX). Set `environme
 - All SQL is parameterized. The backend returns an optional `sql_query` with responses for transparency/debugging.
 
 ---
+
 
 
 
