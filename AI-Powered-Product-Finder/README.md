@@ -25,7 +25,7 @@ The application demonstrates features like vector embeddings, ScaNN indexing and
 - Vector Similarity (pgvector): An extension that enables storing high-dimensional vectors and performing fast semantic search to find contextually related data. 
  
  
-**CloudSQL for PostgreSQL**:
+**Cloud SQL for PostgreSQL**:
 
 *AI Powered Product Finder*
 - Cloud SQL for PostgreSQL as the primary database platform. 
@@ -37,7 +37,7 @@ The application demonstrates features like vector embeddings, ScaNN indexing and
 - Embeddings Creation (google_ml): A specialized extension that allows you to generate vector embeddings directly via SQL by calling Vertex AI models. 
 - Vector Similarity (pgvector): An extension that enables storing high-dimensional vectors and performing fast semantic search to find contextually related data. 
  
-**CloudSQL for MySQL**: 
+**Cloud SQL for MySQL**: 
 
 *AI Powered Product Finder* 
 - Cloud SQL for MySQL as the primary database platform. 
