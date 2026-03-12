@@ -49,7 +49,7 @@ The service account must have these roles:
 - vertexai.user
 
 ### **Environment Configuration**
-Update these variables in medical_config.sh:
+Update these variables in medical_config.sh under Ingestion folder:
 
 - PROJECT_ID (GCP project ID)
 - REGION (e.g. us-central1)
@@ -85,9 +85,19 @@ These variables must be configured correctly for all scripts to run successfully
 
 ---
 
-## Installation
+## Follow the Steps below to Create and Run the Application (Steps: 1-5):
 
-### **Available Scripts**
+## Step 1: Preprocessing
+
+- Refer **Preprocessing** folder and follow steps(from Steps:1-5 in README under Preprocessing folder)
+
+---
+
+## Step 2: Data Ingestion 
+
+- Refer **Ingestion** folder
+
+**Available Scripts**
 
 | Script Name | Purpose |
 |-------------|----------|
@@ -99,28 +109,22 @@ These variables must be configured correctly for all scripts to run successfully
 | `medical_load_alloydb.sh` | Loads GCS data into AlloyDB |
 | `medical_config.sh` | Main configuration file |
 
-### **Script Directory**
-
-Place all scripts under:
+- Create a Script Directory and place all scripts under it:
 <home-directory>/alloydb/medical/script
 
 Dataset repository example:
 https://github.com/ldap/srcdump/tree/main/Ecommerce/dataset
 
----
-
-## Usage — End‑to‑End Execution
-
-### **Step 1: Create AlloyDB Cluster**
+- **Step 2(a): Create AlloyDB Cluster**
 Run:
 alloydb_postgres_cluster_creation.sh
 
-### **Step 2: Clone Dataset Repository**
+- **Step 2(b): Clone Dataset Repository**
 Ensure dataset directory structure:
 <home-directory>/raw_dataset/
 <home-directory>/alloydb/medical/script/
 
-### **Step 3: Upload Dataset to GCS**
+- **Step 2(c): Upload Dataset to GCS**
 Ensure `disease_datafile.csv` is placed in the correct Git path.
 Run:
 medical_git_to_gcs.sh
@@ -128,7 +132,7 @@ medical_git_to_gcs.sh
 Uploads to:
 alloydb-gc-usecase-newsetup/raw/medical
 
-### **Step 4: Create VM and Database Objects**
+- **Step 2(d): Create VM and Database Objects**
 Run:
 medical_create_vm_inst.sh
 This script:
@@ -137,7 +141,7 @@ This script:
 - Executes DDL
 - Prompts for encryption key → enter **Alloydb**
 
-### **Step 5: Load Data into AlloyDB**
+- **Step 2(e): Load Data into AlloyDB** - Creates disease_tests_info table 
 Run:
 medical_load_alloydb.sh
 
@@ -145,3 +149,75 @@ Loads data into:
 alloydb_usecase.disease_tests_info
 
 ---
+
+## Step 3: Creation of tables in AlloyDB
+
+- Refer **Preprocessing** folder and follow steps(from Steps:6-8 in README under Preprocessing folder) which creates tables: disease_details_info, disease_images_info and disease_info_merged (combining all 3: disease_tests_info, disease_details_info, disease_images_info) 
+- TVF is also created (as part of Step 8 in README under Preprocessing folder)
+
+---
+
+## Step 4: Run Backend
+
+- Create Configuration (.env) and replace with your credentials:
+ 
+INSTANCE_URI=<INSTANCE_URI>
+DB_USER=<DB_USER>
+DB_PASSWORD=<DB_PASSWORD>
+DB_NAME=<DB_NAME>
+TABLE_SCHEMA=<TABLE_SCHEMA>
+
+
+- Run the below commands: 
+```
+cd backend
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload
+```
+OpenAPI docs: 
+http://localhost:8080/docs
+Endpoints: 
+POST /medIqSearch
+
+## Step 5: Run Frontend
+
+# Run the Frontend (Angular)
+- **Step 5(a) Install deps**
+```
+cd frontend
+npm ci
+```
+ 
+- **Step 5(b) Proxy API for local dev**
+Create frontend/proxy.conf.json:
+```
+{
+  "/api": {
+    "target": "http://localhost:8080",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": { "^/api": "" }
+  }
+}
+```
+ 
+Update angular.json → architect > serve > options:
+```
+"proxyConfig": "proxy.conf.json"
+```
+ 
+- **Step 5(c) Start Angular**
+```
+npm run start    # or: ng serve
+# http://localhost:4200
+```
+
+- **Step 5(d) Deploy**
+```
+npm run build
+```
+
+
+
+
