@@ -1,27 +1,16 @@
-Hybrid Search
-Sample questions:
-"Smart casual shirts for men with ratings above 3",
-"Grey color apparel for winter with discount more than 20%",
-"Find tops for women under Rs.2000",
-"Show me ethnic clothing in pink color",
-"Looking for winter jackets for women in black color",
-"Show me products that are leggings and have a discount greater than 30%",
-"Show me black casual shoes for men under ₹2000.",
-"I need a summer kurta set for women in blue color.",
-"Find sports shoes for men with discount above 40%",
-"Looking for sunglasses for women under ₹1500",
-"Find me a black rain jacket",
-"casual shirt for men in lavender",
-"handbags for women in coffee brown color",
-"Find handbags for women under ₹2000 with high ratings",
-"Show me U.S. Polo Assn. shirts for men"
+**SERVICE ACCOUNT FOR NLA**:
 
-AI.IF
-"Is this product exhibit any major anomalies or irregularities in its attributes or data profile? Note that irregularity also includes rating greater than 5."
-'Is the rating unusually low or high for a product?'
-"Is the product's usage tag inconsistent with its article type?"
+To utilize the Natural Language API (NLA) and AlloyDB services within the <PROJECT_ID> project, a dedicated Service Account is required. This section details the identity, required permissions, and the IAM policy bindings.
+Replace <PROJECT_ID> with your project id.
 
-Sample input Payload:
+IAM Policy Bindings (JSON) The snippet below illustrates the official IAM policy bindings for the service account principal. This confirms the account is correctly mapped to the necessary roles. 
+Assign the roles specified in the following JSON to your service account to enable NLA agent access.
+Service account name : aia-alloydb-nla@<PROJECT_ID>.iam.gserviceaccount.com 
+Sample JSON: 
+[ { "bindings": { "members": "serviceAccount:aia-alloydb-nla@<PROJECT_ID>.iam.gserviceaccount.com", "role": "roles/alloydb.databaseUser" }, "etag": "BwZMkhhh2FY=", "version": 3 }, { "bindings": { "members": "serviceAccount:aia-alloydb-nla@<PROJECT_ID>.iam.gserviceaccount.com", "role": "roles/cloudaicompanion.user" }, "etag": "BwZMkhhh2FY=", "version": 3 }, { "bindings": { "members": "serviceAccount:aia-alloydb-nla@<PROJECT_ID>.iam.gserviceaccount.com", "role": "roles/geminidataanalytics.dataAgentUser" }, "etag": "BwZMkhhh2FY=", "version": 3 }, { "bindings": { "members": "serviceAccount:aia-alloydb-nla@<PROJECT_ID>.iam.gserviceaccount.com", "role": "roles/geminidataanalytics.queryDataUser" }, "etag": "BwZMkhhh2FY=", "version": 3 }, { "bindings": { "condition": { "expression": "request.time < timestamp(\"2026-01-08T11:19:33.767Z\")", "title": "developer-connect-connection-setup" }, "members": "serviceAccount:aia-alloydb-nla@<PROJECT_ID>.iam.gserviceaccount.com", "role": "roles/geminidataanalytics.queryDataUser" }, "etag": "BwZMkhhh2FY=", "version": 3 }, { "bindings": { "members": "serviceAccount:aia-alloydb-nla@<PROJECT_ID>.iam.gserviceaccount.com", "role": "roles/serviceusage.serviceUsageConsumer" }, "etag": "BwZMkhhh2FY=", "version": 3 } ]
+ 
+
+**Sample input Payload**:
 
 Vector:
 
