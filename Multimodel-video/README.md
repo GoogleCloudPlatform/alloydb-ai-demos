@@ -1,7 +1,19 @@
 
 # Multimodal Video Search (Vertex AI + AlloyDB + pgvector)
 
-**Angular Frontend + FastAPI Backend + Ingestion Pipelines**
+## Application Overview: 
+This demo application enables **semantic, image‑driven video retrieval** across a curated video dataset by converting both **query images** and **representative video keyframes** into a **shared multimodal embedding space (1408‑dim)** using Vertex AI Multimodal Embeddings. The system allows analysts to upload an image such as an incident snapshot, traffic frame, product defect photo, or CCTV still and instantly retrieve the **most semantically similar video segments** from cloud storage. The solution integrates **Vertex AI, AlloyDB/pgvector**, and **GCS**, providing high‑speed vector search. 
+ 
+**Key Alloy DB Components**:
+
+- **AlloyDB for PostgreSQL** serves as the operational backbone, storing video metadata (id, label, duration_s, gcs_uri) along with embedding **VECTOR** fields. 
+- Maintain strict **embedding dimension** alignment by defining VECTOR sizes consistent with **Vertex AI Multimodal Embeddings** for video/text. 
+- **ANN Indexes (pgvector)**: 
+  - Use **HNSW** or **IVFFlat** with the cosine operator class (e.g. **vector_cosine_ops**) and the <=> query operator. 
+  - Tune **IVFFlat** lists/probes or **HNSW** M / ef_search to balance latency and recall. 
+- **ScaNN** (optional, for large-scale deployments): Prefer **ScaNN indexes** with post‑creation ANALYZE when working with very large corpora and if supported in your environment. 
+
+## Angular Frontend + FastAPI Backend + Ingestion Pipelines
 
 > Search short videos by **text** or **image**, powered by **Vertex AI multimodal embeddings** and **AlloyDB (pgvector)**. FastAPI exposes APIs, the **Angular** app is the primary UI, and Python jobs handle ingestion/embedding.
 
@@ -266,8 +278,6 @@ Host the build (Cloud Storage + CDN, Firebase Hosting, or NGINX). Set `environme
 - Prefer **HNSW** indexes; tune `hnsw.ef_search`
 - Start with **1 fps** frame sampling for cost/quality balance
 - Keep media in **GCS**; BYTEA only if compliance/portability required
-
-
 
 
 

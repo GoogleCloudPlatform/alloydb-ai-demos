@@ -1,7 +1,70 @@
-
 # Intelligent Inventory Replenishment (Vertex AI + AlloyDB/CloudSQL + pgvector)
 
-**Angular Frontend + FastAPI Backend + Batch/Streaming Pipelines**
+## Application Overview: 
+
+This demo application demonstrates a **Retail Inventory Agent** built using **LangChain**, **AlloyDB**, and **Google Cloud services**. The solution automates inventory replenishment by leveraging real-time signals, structured data, and contextual documents. The agentic workflow utilizes **Retrieval-Augmented Generation (RAG)** and decision logic to generate purchase orders and manage stock levels efficiently. 
+ 
+**Key AlloyDB Components Utilized**: 
+
+**Inventory Management**:  
+- **AlloyDB for PostgreSQL** serves as the primary operational database, maintaining authoritative records for products, stores, stock levels, transactions, suppliers, and purchase orders.  
+- **AlloyDBVectorStore combined with VertexAIEmbeddings** enables RAG‑based retrieval over documents such as supplier notes, seasonal memos, policies, and SOPs, returning results with citations.  
+Note: VECTOR(d) columns must match the embedding model dimension — d = 768 for Vertex textembedding005.  
+- **ScaNN Index** is the recommended vector‑search option at scale, configured with USING scann (...), tuned num_leaves, and optionally max_num_levels = 2, followed by an ANALYZE operation for optimization.  
+- **pgvector (Fallback Option)**: Supports HNSW or IVFFlat indexing using the appropriate operator class (e.g., vector_cosine_ops) and the matching <=> similarity operator.  
+- **LangChain Integrations**:  
+  - AlloyDBEngine for secure, IAM‑authenticated connection pooling  
+  - AlloyDBVectorStore + VertexAIEmbeddings for retrieval workflows  
+  - (Optional) SQLDatabaseToolkit for structured SQL interactions  
+- **Google Cloud Storage (GCS)** acts as the centralized repository for retail.docs, including policies, SOPs, seasonal notes, and ingestion artifacts.  
+- **Orchestration & Runtime Components** (optional for production):  
+  - **Cloud Run** for hosting agent services and workflow endpoints  
+  - **Secret Manager** for securely storing non‑IAM secrets
+      
+**Sales Forecasting**:  
+- AlloyDB for PostgreSQL as the primary database platform.    
+- Custom models registered in AlloyDB.  
+  
+  
+  
+  
+**Key Cloud SQL Components Utilized**: 
+
+**Inventory Management**:  
+- **CloudSQL for PostgreSQL** serves as the primary operational database, maintaining authoritative records for products, stores, stock levels, transactions, suppliers, and purchase orders.  
+- **AlloyDBVectorStore combined with VertexAIEmbeddings** enables RAG‑based retrieval over documents such as supplier notes, seasonal memos, policies, and SOPs, returning results with citations.  
+Note: VECTOR(d) columns must match the embedding model dimension — d = 768 for Vertex textembedding005.  
+- **ScaNN Index** is the recommended vector‑search option at scale, configured with USING scann (...), tuned num_leaves, and optionally max_num_levels = 2, followed by an ANALYZE operation for optimization.  
+- **pgvector (Fallback Option)**: Supports HNSW or IVFFlat indexing using the appropriate operator class (e.g., vector_cosine_ops) and the matching <=> similarity operator.  
+- **LangChain Integrations**:  
+  - AlloyDBEngine for secure, IAM‑authenticated connection pooling  
+  - AlloyDBVectorStore + VertexAIEmbeddings for retrieval workflows  
+  - (Optional) SQLDatabaseToolkit for structured SQL interactions  
+- **Google Cloud Storage (GCS)** acts as the centralized repository for retail.docs, including policies, SOPs, seasonal notes, and ingestion artifacts.  
+- **Orchestration & Runtime Components** (optional for production):  
+  - **Cloud Run** for hosting agent services and workflow endpoints  
+  - **Secret Manager** for securely storing non‑IAM secrets  
+
+
+**Key MySQL Components Utilized**:                                                                                           
+
+
+**Inventory Management**:  
+- **MySQL** serves as the primary operational database, maintaining authoritative records for products, stores, stock levels, transactions, suppliers, and purchase orders.    
+- **AlloyDBVectorStore combined with VertexAIEmbeddings** enables RAG‑based retrieval over documents such as supplier notes, seasonal memos, policies, and SOPs, returning results with citations.  
+Note: VECTOR(d) columns must match the embedding model dimension — d = 768 for Vertex textembedding005.  
+- **ScaNN Index** is the recommended vector‑search option at scale, configured with USING scann (...), tuned num_leaves, and optionally max_num_levels = 2, followed by an ANALYZE operation for optimization.  
+- **pgvector (Fallback Option)**: Supports HNSW or IVFFlat indexing using the appropriate operator class (e.g., vector_cosine_ops) and the matching <=> similarity operator.  
+- **LangChain Integrations**:  
+  - AlloyDBEngine for secure, IAM‑authenticated connection pooling  
+  - AlloyDBVectorStore + VertexAIEmbeddings for retrieval workflows  
+  - (Optional) SQLDatabaseToolkit for structured SQL interactions  
+- **Google Cloud Storage (GCS)** acts as the centralized repository for retail.docs, including policies, SOPs, seasonal notes, and ingestion artifacts.  
+- **Orchestration & Runtime Components** (optional for production):  
+  - **Cloud Run** for hosting agent services and workflow endpoints  
+  - **Secret Manager** for securely storing non‑IAM secrets 
+
+## Angular Frontend + FastAPI Backend + Batch/Streaming Pipelines
 
 Plan, simulate, and execute inventory replenishment across stores and warehouses. The system combines
 Vertex AI (forecasting & embeddings) with PostgreSQL (AlloyDB or Cloud SQL) + `pgvector` for similarity search.
@@ -302,6 +365,11 @@ Host the build (Cloud Storage + CDN, Firebase Hosting, or NGINX). Set `environme
 - All SQL is parameterized. The backend returns an optional `sql_query` with responses for transparency/debugging.
 
 ---
+
+
+
+
+
 
 
 
