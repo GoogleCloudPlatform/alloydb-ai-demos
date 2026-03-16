@@ -2,5 +2,5 @@ pandas==2.3.3
 SQLAlchemy==2.0.45
 google-cloud-aiplatform
 cloud-sql-python-connector[pg8000]==1.19.0
-fastmcp==2.14.0
+fastmcp==2.14.2
 python-dotenv==1.1.1
