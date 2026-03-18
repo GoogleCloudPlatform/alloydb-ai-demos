@@ -1,4 +1,4 @@
-Sample input Payload:
+**Sample Input Payload**:
 
 Vector:
 daily wear for women for winter
