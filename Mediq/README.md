@@ -183,44 +183,6 @@ POST /medIqSearch
 
 ---
 
-## Step 5: Run Frontend (Angular)
-
-- **Step 5(a) Install deps**
-```
-cd frontend
-npm ci
-```
+## Step 5: Run the Frontend (Angular)
  
-- **Step 5(b) Proxy API for local dev**
-
-Create frontend/proxy.conf.json:
-```
-{
-  "/api": {
-    "target": "http://localhost:8080",
-    "secure": false,
-    "changeOrigin": true,
-    "pathRewrite": { "^/api": "" }
-  }
-}
-```
- 
-Update angular.json → architect > serve > options:
-```
-"proxyConfig": "proxy.conf.json"
-```
- 
-- **Step 5(c) Start Angular**
-```
-npm run start    # or: ng serve
-# http://localhost:4200
-```
-
-- **Step 5(d) Deploy**
-```
-npm run build
-```
-
-
-
-
+*Follow the steps mentioned in README under Frontend folder*
