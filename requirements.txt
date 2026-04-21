@@ -16,7 +16,7 @@ pg8000==1.31.5
 prophet==1.2.1
 psycopg[binary]==3.2.10
 pydantic==2.9.2
-python-dotenv==1.1.1
+python-dotenv==1.2.2
 sqlalchemy==2.0.44
 uvicorn[standard]==0.35.0
 vertexai==1.71.1
