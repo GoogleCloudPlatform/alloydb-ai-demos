@@ -32,7 +32,7 @@
     "@angular/platform-browser": "^20.3.0",
     "@angular/platform-server": "^20.3.0",
     "@angular/router": "^20.3.0",
-    "@angular/ssr": "^20.3.12",
+    "@angular/ssr": "^20.3.25",
     "chart.js": "^4.5.1",
     "express": "^5.1.0",
     "install": "^0.13.0",
