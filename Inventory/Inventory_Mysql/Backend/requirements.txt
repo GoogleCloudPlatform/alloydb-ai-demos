@@ -1,4 +1,4 @@
-aiohttp==3.13.0
+aiohttp==3.14.0
 cloud-sql-python-connector==1.18.5
 fastapi==0.121.2 
 google-cloud-pubsub==2.31.1
