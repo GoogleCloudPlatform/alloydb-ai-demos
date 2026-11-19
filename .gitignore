@@ -1,0 +1,4 @@
+# Local environment files hold credentials and must not be committed.
+.env
+.env.*
+!.env.example
