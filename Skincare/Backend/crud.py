@@ -225,16 +225,11 @@ async def get_alloydb_sql_summary(query: str) -> GetSqlSummaryResponse:
   """Executes alloydb_ai_nl.get_sql_summary."""
   if not pool:
     raise RuntimeError("Database pool not initialized")
-  # Note: Using f-string requires careful handling of quotes if query
-  # contains them. Parameterization is safer if the function supports it.
-  # Assuming it takes a literal.
-  # Replicating Node.js's toPgStringLiteral logic (basic version)
-  escaped_query = query.replace("'", "''")
-  sql = f"""
-        SELECT alloydb_ai_nl.get_sql_summary('{settings.nl_config_name}', E'{escaped_query}');
+  sql = """
+        SELECT alloydb_ai_nl.get_sql_summary($1, $2);
     """
   async with pool.acquire() as conn:
-    records = await conn.fetch(sql)  # Assuming it returns JSONB
+    records = await conn.fetch(sql, settings.nl_config_name, query)
     processed_results = []
     for record in records:
       if record["get_sql_summary"]:
