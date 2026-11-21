@@ -229,7 +229,7 @@ async def get_alloydb_sql_summary(query: str) -> GetSqlSummaryResponse:
         SELECT alloydb_ai_nl.get_sql_summary($1, $2);
     """
   async with pool.acquire() as conn:
-    records = await conn.fetch(sql, settings.nl_config_name, query)
+    records = await conn.fetch(sql, settings.nl_config_name, query)  # Assuming it returns JSONB
     processed_results = []
     for record in records:
       if record["get_sql_summary"]:
