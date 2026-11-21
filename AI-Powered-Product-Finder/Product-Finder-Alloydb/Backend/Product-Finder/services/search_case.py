@@ -2,17 +2,16 @@
 # Imports
 # -----------------------------------------------------------------------------
 
-from sqlalchemy import text, bindparam  # Build safe SQL statements
+import math
+from sqlalchemy import String, text, bindparam  # Build safe SQL statements
 from sqlalchemy.engine import Engine
 import logging  # Application-level logging
 from typing import Dict, Any
 import re
 import json
-import traceback
 import google.auth
 import google.auth.transport.requests
 from google.oauth2 import service_account
-import sqlparse
 import requests
 from config import (
     ALLOYDB_SCHEMA_NAME,
@@ -29,18 +28,38 @@ from config import (
     LOCATION,
     SCOPES,
 )
+from services.sql_guard import (
+    UnsafeSQLError,
+    build_safe_nltosql_query,
+    clean_search_text,
+    combine_where_clauses,
+    compile_sql_constraints,
+    empty_search_result,
+    execute_readonly,
+    format_display_sql,
+    validate_question_template,
+    validate_sql_identifier,
+)
 from services.utils import (
     normalize_filters,
     build_where_clause,
-    merge_filter_where,
-    merge_where_clauses,
-    remove_single_line_comments,
 )
 
 # -----------------------------------------------------------------------------
 # Logging configuration (module-level)
 # -----------------------------------------------------------------------------
 logging.basicConfig(level=logging.INFO)
+
+
+def _ui_binds(filter_params: Dict[str, Any]) -> list:
+    binds = []
+    for k, v in filter_params.items():
+        if isinstance(v, str):
+            v = clean_search_text(v)
+        elif isinstance(v, float) and not math.isfinite(v):
+            raise UnsafeSQLError(f"Non-finite float in UI filter {k!r}")
+        binds.append(bindparam(k, value=v))
+    return binds
 
 
 # -----------------------------------------------------------------------------
@@ -64,9 +83,38 @@ class AlloyDbSearchTypes:
         """
         # Store engine for per-call connection scopes
         self.engine = engine
+        self.schema_name = validate_sql_identifier(ALLOYDB_SCHEMA_NAME)
+        self.table_name = validate_sql_identifier(TABLE_NAME)
+        self.table_ref = f"{self.schema_name}.{self.table_name}"
 
         # Per-class logger; helps identify log lines from this service
         self.logger = logging.getLogger("AlloyDbSearchTypes")
+
+    def _prepare_semantic_search(
+        self,
+        question: Any,
+        where_sql: str,
+        filter_params: Dict[str, Any],
+        filtered_search: Any,
+        semantic_text: Any,
+    ) -> tuple[str, str, list]:
+        search_text = None
+        if semantic_text is not None:
+            try:
+                cleaned_sem = clean_search_text(semantic_text)
+                if cleaned_sem:
+                    search_text = cleaned_sem
+            except UnsafeSQLError:
+                self.logger.warning("Ignoring invalid semantic_text")
+        if search_text is None:
+            search_text = clean_search_text(question)
+        try:
+            llm_where_sql, llm_binds = compile_sql_constraints(filtered_search)
+        except UnsafeSQLError:
+            self.logger.warning("Dropping unsafe sql_constraints")
+            llm_where_sql, llm_binds = "", {}
+        where_clause = combine_where_clauses(where_sql, llm_where_sql)
+        return search_text, where_clause, [*_ui_binds(filter_params), *llm_binds.values()]
 
     def get_access_token(self):
         # Ensure this points ONLY to your JSON file
@@ -226,7 +274,7 @@ class AlloyDbSearchTypes:
     # Vector search (semantic similarity)
     # -------------------------------------------------------------------------
     async def vector_search(
-        self, question: str, filters: dict, filtered_search: str, semantic_text: str
+        self, question: str, filters: dict, filtered_search: str | None = None, semantic_text: str | None = None
     ) -> dict:
         """
         Find products semantically similar to the user's query using embeddings.
@@ -249,21 +297,13 @@ class AlloyDbSearchTypes:
         filters_dict = normalize_filters(filters)
         where_sql, filter_params = build_where_clause(filters_dict)
 
-        if semantic_text is not None:
-            question = semantic_text
-
-        if filtered_search is not None:
-            if where_sql and filtered_search not in where_sql:
-                where_sql = where_sql + " AND " + filtered_search
-            else:
-                where_sql = "WHERE " + filtered_search
-
-        params = {
-            "question": question,
-            "embedding": EMBEDDING,
-            "vector_threshold": VECTOR_THRESHOLD,
-        }
-        params.update(filter_params)
+        try:
+            question, where_sql, filter_binds = self._prepare_semantic_search(
+                question, where_sql, filter_params, filtered_search, semantic_text
+            )
+        except UnsafeSQLError:
+            self.logger.warning("Rejected invalid input in Vector Search")
+            return empty_search_result()
 
         # Preparing Query
         # Compute similarity using google_ml.embedding('text-embedding-005'). Lower is more similar.
@@ -272,7 +312,7 @@ class AlloyDbSearchTypes:
             WITH top_matches AS (
                 SELECT *,
                        combined_description_embedding <=> google_ml.embedding(:embedding, :question)::vector AS vector_score
-                FROM {ALLOYDB_SCHEMA_NAME}.{TABLE_NAME}
+                FROM {self.table_ref}
                 {where_sql}
                 ORDER BY vector_score
             )
@@ -287,23 +327,18 @@ class AlloyDbSearchTypes:
             FROM top_matches
             WHERE vector_score <= :vector_threshold;
             """
+        ).bindparams(
+            bindparam("question", value=question, type_=String()),
+            bindparam("embedding", value=EMBEDDING, type_=String()),
+            bindparam("vector_threshold", value=VECTOR_THRESHOLD),
+            *filter_binds,
         )
-        query = query.bindparams(*(bindparam(k, value=v) for k, v in params.items()))
-        compiled = query.compile(
-            dialect=self.engine.dialect, compile_kwargs={"literal_binds": True}
-        )
-        raw_sql = str(compiled)
-        # Format the string
-        formatted_sql = sqlparse.format(
-            raw_sql, 
-            reindent=True, 
-        )
-        sql_string = formatted_sql
+
+        sql_string = format_display_sql(query)
 
         try:
             with self.engine.connect() as connection:
                 self.logger.info("Database connection established for vector search.")
-                self.logger.info(f"Executing the query for Vector Search:{sql_string}")
                 result = connection.execute(query)
                 rows = result.mappings().all()
 
@@ -333,19 +368,15 @@ class AlloyDbSearchTypes:
                 # Return the executed SQL command and details
                 return {"sql_command": sql_string, "details": details}
 
-        except Exception as e:
-            # Log the error with context and return a safe message
-            traceback_details = traceback.format_exc()
-            self.logger.error(f"Error executing Vector Search: {e}")
-            return {
-                "error": f"Error occured during Vector Search output generation:{e}, Traceback :{traceback_details}"
-            }
+        except Exception:
+            self.logger.exception("Error executing Vector Search")
+            return empty_search_result()
 
     # -------------------------------------------------------------------------
     # Hybrid search (full text search + vector similarity)
     # -------------------------------------------------------------------------
     async def hybrid_search(
-        self, question: str, filters: dict, filtered_search: str, semantic_text: str
+        self, question: str, filters: dict, filtered_search: str | None = None, semantic_text: str | None = None
     ) -> dict:
         """
         Combine full-text ranking (ts_rank_cd + websearch_to_tsquery) with
@@ -372,21 +403,13 @@ class AlloyDbSearchTypes:
         filters_dict = normalize_filters(filters)
         where_sql, filter_params = build_where_clause(filters_dict)
 
-        if semantic_text is not None:
-            question = semantic_text
-
-        if filtered_search is not None:
-            if where_sql and filtered_search not in where_sql:
-                where_sql = where_sql + " AND " + filtered_search
-            else:
-                where_sql = "WHERE " + filtered_search
-
-        params = {
-            "question": question,
-            "embedding": EMBEDDING,
-            "hybrid_threshold": HYBRID_THRESHOLD,
-        }
-        params.update(filter_params)
+        try:
+            question, where_sql, filter_binds = self._prepare_semantic_search(
+                question, where_sql, filter_params, filtered_search, semantic_text
+            )
+        except UnsafeSQLError:
+            self.logger.warning("Rejected invalid input in Hybrid Search")
+            return empty_search_result()
 
         # Preparing Query
         query = text(
@@ -399,7 +422,7 @@ class AlloyDbSearchTypes:
                     0.5 * ts_rank_cd(to_tsvector('english', combined_description),
                                      websearch_to_tsquery(:question)) +
                     0.5 * (1 - (combined_description_embedding <=> query_embedding.embed::vector)) AS hybrid_score
-                FROM {ALLOYDB_SCHEMA_NAME}.{TABLE_NAME}, query_embedding
+                FROM {self.table_ref}, query_embedding
                 {where_sql}
                 ORDER BY hybrid_score DESC
             )
@@ -416,6 +439,7 @@ class AlloyDbSearchTypes:
             """
         )
 
+        # UNSAFE: do not re-enable without parameterizing via sql_guard
         # Uncomment the below 'query' block, if preferred approach is HYBRID SEARCH USING RECIPROCAL RANK FUSION, Reference link: https://docs.cloud.google.com/alloydb/docs/ai/run-hybrid-vector-similarity-search
         # query = f"""
         #     WITH query_embedding AS (
@@ -453,24 +477,18 @@ class AlloyDbSearchTypes:
         #     -- RRF_THRESHOLD Value to be added to config if utilised
         #     WHERE rrf_score >= <RRF_THRESHOLD>;"""
 
-        query = query.bindparams(*(bindparam(k, value=v) for k, v in params.items()))
-        compiled = query.compile(
-            dialect=self.engine.dialect, compile_kwargs={"literal_binds": True}
+        query = query.bindparams(
+            bindparam("question", value=question, type_=String()),
+            bindparam("embedding", value=EMBEDDING, type_=String()),
+            bindparam("hybrid_threshold", value=HYBRID_THRESHOLD),
+            *filter_binds,
         )
 
-        
-        raw_sql = str(compiled)
-        # Format the string
-        formatted_sql = sqlparse.format(
-            raw_sql, 
-            reindent=True, 
-        )
-        sql_string = formatted_sql
+        sql_string = format_display_sql(query)
 
         try:
             with self.engine.connect() as connection:
                 self.logger.info("Database connection established for hybrid search.")
-                self.logger.info(f"Executing the query for Hybrid Search:{sql_string}")
                 result = connection.execute(query)
                 rows = result.mappings().all()
 
@@ -497,13 +515,9 @@ class AlloyDbSearchTypes:
                     )
                 return {"sql_command": sql_string, "details": details}
 
-        except Exception as e:
-            traceback_details = traceback.format_exc()
-            self.logger.error(f"Error executing Hybrid Search: {e}")
-            return {
-                "error": f"Error occured during Hybrid Search output generation:{e}",
-                "traceback": traceback_details,
-            }
+        except Exception:
+            self.logger.exception("Error executing Hybrid Search")
+            return empty_search_result()
 
     # -------------------------------------------------------------------------
     # NL-to-SQL search through NLA
@@ -527,10 +541,18 @@ class AlloyDbSearchTypes:
             }
         """
         # Normalize filters and build WHERE clause
-        filters_dict = normalize_filters(filters)
-        where_sql, filter_params = build_where_clause(filters_dict)
+        ui_where_sql, ui_params = build_where_clause(normalize_filters(filters))
+
+        try:
+            question = clean_search_text(question)
+        except UnsafeSQLError:
+            self.logger.warning("Invalid input for NL-to-SQL.")
+            return empty_search_result()
 
         access_token = self.get_access_token()
+        if not isinstance(access_token, str) or not access_token.strip():
+            self.logger.warning("Missing NLA access token; skipping NL-to-SQL.")
+            return empty_search_result()
 
         payload = {
             "prompt": question,
@@ -554,88 +576,57 @@ class AlloyDbSearchTypes:
             },
         }
 
-        nla_response = requests.post(
-            NLA_API,
-            headers={
-                "Authorization": f"Bearer {access_token}",
-                "Content-Type": "application/json",
-            },
-            data=json.dumps(payload),
-            timeout=120,
-        )
-        self.logger.info("NLA RESPONSE: ", nla_response)
-        if nla_response.status_code != 200:
-            # if not nla_response:
-            raise RuntimeError(f"queryData failed:  {nla_response.text}")
-
-        nla_response_json = nla_response.json()
-        generated_sql = nla_response_json["generatedQuery"]
-        generated_sql = remove_single_line_comments(generated_sql)
-        self.logger.info("Cleaned query: ", generated_sql)
-
         try:
-            with self.engine.connect() as connection:
-                self.logger.info("Database connection established for nltosql search.")
+            nla_response = requests.post(
+                NLA_API,
+                headers={
+                    "Authorization": f"Bearer {access_token}",
+                    "Content-Type": "application/json",
+                },
+                data=json.dumps(payload),
+                timeout=120,
+            )
+            if nla_response.status_code != 200:
+                self.logger.warning("NLA queryData failed with status %s", nla_response.status_code)
+                return empty_search_result()
 
-                # Take the original SELECT and replace it with a full-column SELECT
-                # so that the UI gets complete product details to display while preserving filters.
-                rewritten_sql = merge_where_clauses(where_sql, generated_sql)
+            nla_response_json = nla_response.json()
+            raw_sql = nla_response_json.get("generatedQuery") if isinstance(nla_response_json, dict) else None
+            if not isinstance(raw_sql, str) or not raw_sql.strip():
+                self.logger.warning("NLA response missing valid generatedQuery.")
+                return empty_search_result()
 
-                base_select_all = "SELECT productDisplayName, link, unitPrice, discount, finalPrice, rating"               # Naive swap: replace everything from SELECT to FROM with UI fields.
-                # Works when generated SQL is a single SELECT ... FROM ...
-                match_from = re.search(r"\bFROM\b", rewritten_sql, flags=re.IGNORECASE)
-                if match_from:
-                    rewritten_sql = (
-                        base_select_all + "\n" + rewritten_sql[match_from.start() :]
-                    )
-                # 3) Execute rewritten SQL WITH filter params
-                query = text(rewritten_sql)
-                query = query.bindparams(
-                    *(bindparam(k, value=v) for k, v in filter_params.items())
-                )
-                compiled = query.compile(
-                    dialect=self.engine.dialect, compile_kwargs={"literal_binds": True}
-                )
-                raw_sql = str(compiled)
-                # Format the string
-                formatted_sql = sqlparse.format(
-                    raw_sql, 
-                    reindent=True, 
-                )
-                sql_string = formatted_sql
-                self.logger.info(f"Executing the query for NL-to-SQL:{sql_string}")
-                rows = connection.execute(query).mappings().all()
-
-                if not rows:
-                    return {"sql_command": sql_string, "details": []}
-
-                details = []
-                for r in rows:
-                    details.append(
-                        {
-                            "productDisplayName": r.get("productdisplayname"),
-                            "link": r.get("link"),
-                            "unitPrice": r.get("unitprice"),
-                            "discount": r.get("discount"),
-                            "finalPrice": r.get("finalprice"),
-                            "rating": r.get("rating"),
-                        }
-                    )
-                self.logger.info("Query executed successfully for nltosql search.")
-
-                return {
-                    "sql_command": sql_string,  # Return the original NL-generated SQL with the filter parameters
-                    "details": details,  # Return product features
+            query, sql_string = build_safe_nltosql_query(
+                raw_sql,
+                ui_where_sql,
+                ui_params,
+                table_name=self.table_name,
+                schema_name=self.schema_name,
+            )
+            rows = execute_readonly(self.engine, query)
+            details = [
+                {
+                    "productDisplayName": r.get("productdisplayname"),
+                    "link": r.get("link"),
+                    "unitPrice": r.get("unitprice"),
+                    "discount": r.get("discount"),
+                    "finalPrice": r.get("finalprice"),
+                    "rating": r.get("rating"),
                 }
+                for r in rows
+            ]
+            if rows:
+                self.logger.info("Query executed successfully for nltosql search.")
+            return {"sql_command": sql_string, "details": details}
 
-        except Exception as e:
-            traceback_details = traceback.format_exc()
-            self.logger.error(f"Error executing NL-to-SQL: {e}")
-            return {
-                "error": f"Error occured during NL-to-SQL output generation:{e}",
-                "traceback": traceback_details,
-            }
+        except UnsafeSQLError:
+            self.logger.warning("Rejected unsafe NL-to-SQL query.")
+            return empty_search_result()
+        except Exception:
+            self.logger.exception("Error executing NL-to-SQL")
+            return empty_search_result()
 
+    # UNSAFE: do not re-enable without parameterizing via sql_guard
     # ---- NL to SQL through AlloyDB AI NL (alloydb_ai_nl.get_sql) ----
     #     async def nltosql_search(self, question: str, filters: dict) -> dict:
     #         """
@@ -741,13 +732,16 @@ class AlloyDbSearchTypes:
     #                 "traceback": traceback_details,
     #             }
 
-    async def ai_if_case(self, sql_query: str, filters: dict) -> dict:
+    async def ai_if_case(
+        self, question_template: str | None, filters: dict, filtered_search: str | None = None
+    ) -> dict:
         """Find products when semantic filtering is required.
         Uses `ai.if` to find relevant products
 
         Args:
-            sql_query (str): The SQL query to be executed using AI.IF.
+            question_template (str | None): Validated YES/NO prompt template for AI.IF.
             filters (dict): Filtered results based on user selected filters
+            filtered_search (str | None): Structured SQL constraints extracted from question.
         Returns:
             dict: {
                 "sql_command": string,
@@ -757,23 +751,45 @@ class AlloyDbSearchTypes:
         """
         filters_dict = normalize_filters(filters)
         where_sql, filter_params = build_where_clause(filters_dict)
-        sql_query = merge_filter_where(sql_query, where_sql)
-        query = text(sql_query)
-        query = query.bindparams(
-            *(bindparam(k, value=v) for k, v in filter_params.items())
-        )
-        compiled = query.compile(
-            dialect=self.engine.dialect, compile_kwargs={"literal_binds": True}
-        )
-        raw_sql = str(compiled)
-        # Format the string
-        formatted_sql = sqlparse.format(
-            raw_sql, 
-            reindent=True, 
-        )
-        sql_string = formatted_sql
-
         try:
+            cleaned_template = validate_question_template(question_template)
+            llm_where_sql, llm_binds = compile_sql_constraints(filtered_search)
+            where_clause = combine_where_clauses(where_sql, llm_where_sql)
+            query = text(
+                f"""
+                WITH base AS (
+                    SELECT id, productDisplayName, link, unitPrice, discount, finalPrice, rating,
+                           combined_description
+                    FROM {self.table_ref}
+                    {where_clause}
+                ),
+                prompts AS (
+                    SELECT id,
+                           (:question_template || E'\\n' || 'Here is the product description: ' || coalesce(combined_description, '')) AS prompt
+                    FROM base
+                ),
+                all_prompts AS (
+                    SELECT ARRAY_AGG(id ORDER BY id) AS ids,
+                           ai.if(prompts => ARRAY_AGG(prompt ORDER BY id)) AS results
+                    FROM prompts
+                    HAVING COUNT(*) > 0
+                ),
+                correlated_results AS (
+                    SELECT all_prompts.ids[i] AS id, all_prompts.results[i] AS keep_row
+                    FROM all_prompts, generate_series(1, array_length(all_prompts.ids, 1)) AS i
+                )
+                SELECT b.productDisplayName, b.link, b.unitPrice, b.discount, b.finalPrice, b.rating
+                FROM base b
+                JOIN correlated_results cr ON cr.id = b.id
+                WHERE cr.keep_row IS TRUE;
+                """
+            ).bindparams(
+                bindparam("question_template", value=cleaned_template, type_=String()),
+                *_ui_binds(filter_params),
+                *llm_binds.values(),
+            )
+            sql_string = format_display_sql(query)
+
             with self.engine.connect() as connection:
                 self.logger.info("Database connection established for AI.IF search.")
                 result = connection.execute(query)
@@ -796,13 +812,12 @@ class AlloyDbSearchTypes:
                     )
                 return {"sql_command": sql_string, "details": details}
 
-        except Exception as e:
-            traceback_details = traceback.format_exc()
-            self.logger.error(f"Error executing AI.IF search case: {e}")
-            return {
-                "error": f"Error occured during AI.IF output generation:{e}",
-                "traceback": traceback_details,
-            }
+        except UnsafeSQLError:
+            self.logger.warning("Rejected unsafe AI.IF input.")
+            return empty_search_result()
+        except Exception:
+            self.logger.exception("Error executing AI.IF search case")
+            return empty_search_result()
 
 
 class IdentifySearchType:
@@ -812,7 +827,7 @@ class IdentifySearchType:
 
     def search_strategy_prompt(self):
         """
-        Decides search strategy, SQL Constraints for Vector/Hybrid Search and SQL query for ai.if
+        Decides search strategy, SQL Constraints for Vector/Hybrid/AI.IF Search
         """
         system_instruction = """
         You are the Decision Engine for a retail product Search System backed by AlloyDB for PostgreSQL with AlloyDB AI.
@@ -891,10 +906,8 @@ class IdentifySearchType:
         - The user wants semantic filtering inside SQL at row level.
 
         IMPORTANT — Prompt Shape:
-        - Convert the user request into a single YES/NO question applied to each row.
-        - Template:
-        "<user question rephrased yes/no question based on the user intent>
-        Here is the product description:"
+        - Convert the user request into a single YES/NO question in `parameters.question_template` (do NOT append "Here is the product description:" and do NOT output `sql_query`).
+        - Put any explicit structured catalog filters in `parameters.sql_constraints` (or null if none).
         - Keep the question concise and unambiguous.
 
         EXAMPLES (User → Question Template):
@@ -995,65 +1008,13 @@ class IdentifySearchType:
             "raw_query": "<user_query>",
             "question_template": "<ONLY WHEN selected_strategy = 'ai.if'>"
         },
-        "decision_path": ["gate:<passed|failed>", "strategy:<chosen|none>", "ai.if:<applicable|not_applicable>"],
-        "sql_query": "<INCLUDE THIS KEY **ONLY** WHEN selected_strategy = 'ai.if'. Omit this key for all other strategies.>"
+        "decision_path": ["gate:<passed|failed>", "strategy:<chosen|none>", "ai.if:<applicable|not_applicable>"]
         }
 
         ============================================================
-        5) HOW TO COMPOSE 'sql_query' WHEN selected_strategy = "ai.if"
-            (ARRAY-BASED, QUESTION STYLE)
+        5) SAFETY RULES
         ============================================================
-
-        - Table: alloydb_usecase.fashion_products
-        - Always pre-filter with a base CTE that applies explicit constraints (e.g., gender, brand, numeric ranges).
-        - Use {{sql_constraints}}
-        - Use combined_description to form the row text.
-        - Build a single YES/NO question string from the user query, stored as {{question_template}}.
-        - The ai.if operator returns booleans that can be correlated per row.
-        - Use the array-based batch evaluation pattern and correlate ids back to rows via arrays.
-
-        Example shape (adapt filters to your parsed constraints):
-
-        WITH base AS (
-        SELECT
-            id, productDisplayName, brand, link, unitPrice, discount, finalPrice, rating,
-            combined_description
-        FROM alloydb_usecase.fashion_products
-        <Apply structured constraints detected from the user query: {{sql_constraints}} if not None using WHERE>
-        ),
-        prompts AS (
-        SELECT
-            id,
-            (
-            {{question_template}} || E'\n' ||
-            'Here is the product description: ' || combined_description
-            ) AS prompt
-        FROM base
-        ),
-        all_prompts AS (
-        SELECT
-            ARRAY_AGG(id ORDER BY id) AS ids,
-            ai.if(prompts => ARRAY_AGG(prompt ORDER BY id)) AS results
-        FROM prompts
-        ),
-        correlated_results AS (
-        SELECT
-            all_prompts.ids[i]     AS id,
-            all_prompts.results[i] AS keep_row
-        FROM all_prompts,
-            generate_series(1, array_length(all_prompts.ids, 1)) AS i
-        )
-        SELECT
-        b.productDisplayName, b.brand, b.link, b.unitPrice, b.discount, b.finalPrice, b.rating,
-        b.combined_description
-        FROM base b
-        JOIN correlated_results cr
-        ON cr.id = b.id
-        WHERE cr.keep_row = TRUE;
-
-        ============================================================
-        6) SAFETY RULES
-        ============================================================
+        - Never output "sql_query" or raw SQL statements.
         - Never fabricate attributes or external facts.
         - If the question is off-topic (weather, politics, medical advice, etc.) → reject.
         """
@@ -1132,11 +1093,14 @@ class IdentifySearchType:
                 }
         """
 
+        self.user_query = clean_search_text(self.user_query)
         with self.engine.connect() as conn:
             # Prompt to identify search strategy
             prompt = self.search_strategy_prompt()
-            determine_search_sql = text("SELECT ai.generate(prompt => :prompt)")
-            result = conn.execute(determine_search_sql, {"prompt": prompt})
+            determine_search_sql = text("SELECT ai.generate(prompt => :prompt)").bindparams(
+                bindparam("prompt", value=prompt, type_=String())
+            )
+            result = conn.execute(determine_search_sql)
 
             # Scalar is cleaner for single-value SELECTs
             payload = result.scalar()
