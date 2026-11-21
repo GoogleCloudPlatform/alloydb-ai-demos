@@ -1,24 +1,28 @@
 """Defines and registers various tools for the LangGraph agent."""
 import json
-from typing import Any, Dict, List, Optional
+from typing import Annotated, Any, Dict, List, Optional
 import crud
 from langchain.tools import tool
+from langgraph.prebuilt import InjectedState
 from models import UserDetails, OrderDetails
 import logic
+
+InjectedUserId = Annotated[int, InjectedState("user_id")]
 
 # --- Tool Definitions ---
 
 
 @tool
 async def orderCheckout(
-    product_name: str, price: float, user_id: int = 123
+    product_name: str, price: float, user_id: InjectedUserId
 ) -> Dict[str, Any]:
-  """Fetches user details like shipping address and partial credit card info for the given user ID.
+  """Fetches user details like shipping address and partial credit card info for the current session.
 
   Provided product name and price are used to construct the response text.
 
   Args:
-      user_id (int): The ID of the user whose details are to be fetched.
+      product_name (str): The name of the product to check out.
+      price (float): The price of the product to check out.
 
   Returns:
       Dict: A dictionary containing order details or an error message.
@@ -54,7 +58,7 @@ async def orderCheckout(
 
 @tool
 async def getResultsOnly(
-    query: str, user_id: int = 123
+    query: str, user_id: InjectedUserId
 ) -> Dict[str, Any]:
   """Executes a natural language query against the product database.
 
@@ -65,7 +69,6 @@ async def getResultsOnly(
 
   Args:
       query (str): The natural language query to execute.
-      user_id (int): The ID of the user for whom the query is being executed.
 
   Returns:
       Dict: A dictionary containing the query results or an error message.
@@ -106,7 +109,7 @@ async def getResultsOnly(
 
 
 @tool
-async def getSummaryOnly(query: str, user_id: int = 123) -> Dict[str, Any]:
+async def getSummaryOnly(query: str, user_id: InjectedUserId) -> Dict[str, Any]:
   """Generates a natural language summary or explanation for a query about products or comparisons.
 
   Use this when the user asks 'why', 'explain', 'compare', 'tell me more about'.
@@ -132,7 +135,7 @@ async def getSummaryOnly(query: str, user_id: int = 123) -> Dict[str, Any]:
 
 
 @tool
-async def getSummaryAndResults(query: str, user_id: int = 123) -> Dict[str, Any]:
+async def getSummaryAndResults(query: str, user_id: InjectedUserId) -> Dict[str, Any]:
   """Returns the results and summary for a given query."""
   print(f"TOOL: getSummaryAndResults called for query: '{query}'")
   summary_text = ""
@@ -180,15 +183,14 @@ async def getSummaryAndResults(query: str, user_id: int = 123) -> Dict[str, Any]
 
 
 @tool
-async def get_product_price(product_name: str, user_id: int = 123) -> Dict[str, Any]:
+async def get_product_price(product_name: str, user_id: InjectedUserId) -> Dict[str, Any]:
   """Gets the price of a specific product using a natural language query to the database.
 
-  Requires the product name and user ID.
+  Requires the product name.
 
   Args:
       product_name (str): The name of the product for which the price is to be
         fetched.
-      user_id (int): The ID of the user for whom the price is being checked.
 
   Returns:
   Returns:
@@ -235,7 +237,7 @@ async def get_product_price(product_name: str, user_id: int = 123) -> Dict[str, 
 
 @tool
 async def orderInsert(
-    product_name: str, price: float, user_id: int = 123
+    product_name: str, price: float, user_id: InjectedUserId
 ) -> Dict[str, Any]:
   """Inserts a confirmed order into the database ONLY AFTER the user has confirmed details.
   """
