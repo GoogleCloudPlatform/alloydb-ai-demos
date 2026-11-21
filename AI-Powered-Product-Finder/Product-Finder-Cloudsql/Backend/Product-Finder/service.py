@@ -157,18 +157,11 @@ class CloudSQLSearchTypes:
             On success: list of dict rows (keys in Title Case).
             On failure: error dict with message and details.
         """
-        filters_dict = _normalize_filters(filters)
-        where_sql, filter_params = _build_where_clause(filters_dict)
+        where_sql, filter_params = _compose_where_clause(filters, filtered_search)
 
         if semantic_text != None:
             question = semantic_text
             
-        if filtered_search != None: 
-            if where_sql and filtered_search not in where_sql:
-                where_sql = where_sql + " AND " + filtered_search
-            else:
-                where_sql = "WHERE " + filtered_search
-
         params = {"question": question, "vector_threshold": VECTOR_THRESHOLD}
         params.update(filter_params)
 
@@ -219,7 +212,7 @@ class CloudSQLSearchTypes:
                 return {"sql_command": sql_string, "details": data}
         except Exception as e:
             logger.error(f"Vector search failed: {str(e)}", exc_info=True)
-            return {"error": "Database query failed", "details": str(e)}
+            return {"error": "Database query failed", "details": "An internal error occurred while executing the search query."}
 
     def hybrid_search(self,engine,question, filters, filtered_search, semantic_text):
         """
@@ -239,18 +232,11 @@ class CloudSQLSearchTypes:
             On success: list of dict rows (keys in Title Case).
             On failure: error dict with message and details.
         """
-        filters_dict = _normalize_filters(filters)
-        where_sql, filter_params = _build_where_clause(filters_dict)
+        where_sql, filter_params = _compose_where_clause(filters, filtered_search)
 
         if semantic_text != None:
             question = semantic_text
             
-        if filtered_search != None: 
-            if where_sql and filtered_search not in where_sql:
-                where_sql = where_sql + " AND " + filtered_search
-            else:
-                where_sql = "WHERE " + filtered_search
-
         params = {"question": question, "hybrid_threshold": HYBRID_THRESHOLD}
         params.update(filter_params)
 
@@ -302,7 +288,7 @@ class CloudSQLSearchTypes:
                 return {"sql_command": sql_string, "details": data}
         except Exception as e:
             logger.error(f"Hybrid search failed: {str(e)}", exc_info=True)
-            return {"error": "Database query failed", "details": str(e)}
+            return {"error": "Database query failed", "details": "An internal error occurred while executing the search query."}
 
 class IdentifySearchTypes:
     
@@ -423,7 +409,9 @@ class IdentifySearchTypes:
                  - Gender points to gender = 'Men'/'Women'/'Boys'/'Girls'/'Unisex'
                  - Season points to season ILIKE '%<season>%'
                  - Usage or Wear to usage ILIKE '%<usage>%'
-                 - Products to productDisplayName ILIKE '%productname%>
+                 - Products to productDisplayName ILIKE '%<productname>%'
+               - Use ONLY simple column comparisons (=, !=, <>, <, <=, >, >=, [NOT] LIKE/ILIKE, [NOT] BETWEEN, [NOT] IN, IS [NOT] NULL) combined with AND, OR, NOT, and parentheses.
+               - Do NOT emit SQL functions, type casts (::), subqueries, UNION, semicolons (;), or comments (-- or /* */).
                - Price interpretations:
                   under/less than X points to  finalPrice <= X
                   over/more than X points to  finalPrice >= X
