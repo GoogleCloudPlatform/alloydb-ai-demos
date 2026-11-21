@@ -210,11 +210,12 @@ async def magic_api(request: MagicApiQueryParams):
 
   session_id = request.sessionId
   user_query = request.query
-  user_id = (
-      request.userId
-      if request.userId is not None
-      else settings.default_user_id
-  )
+  user_id = settings.default_user_id
+  if request.userId is not None and request.userId != user_id:
+    raise HTTPException(
+        status_code=403,
+        detail="Unauthorized userId for this demo session.",
+    )
 
   print("\n--- New Request ---")
   print(f"Session ID: {session_id}")
