@@ -1,12 +1,16 @@
+from typing import Any
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-import traceback
 from db.alloydb_client import AlloyDBClient
 from services.search_case import AlloyDbSearchTypes, IdentifySearchType
+from services.sql_guard import UnsafeSQLError, clean_search_text, empty_search_result
 from config import INSTANCE_URI, DB_USER, DB_PASSWORD, DB_NAME, log_execution, logger
+
+_GENERIC_SEARCH_ERROR = "An internal error occurred while processing the search request."
+_ALLOWED_SEARCH_TYPES = frozenset({"vector", "hybrid", "nl_to_sql", "ai.if", "reject"})
 
 # ---------- Initialize Engine ----------
 alloydb_client = AlloyDBClient(INSTANCE_URI, DB_USER, DB_PASSWORD, DB_NAME)
@@ -37,6 +41,26 @@ class SearchResponse(BaseModel):
     search_type: str
     reason: str
     answer: dict
+
+
+def _normalize_answer(answer: Any) -> dict:
+    if isinstance(answer, dict) and isinstance(answer.get("details"), list):
+        sql_cmd = answer.get("sql_command")
+        return {"sql_command": sql_cmd if isinstance(sql_cmd, str) else "", "details": answer["details"]}
+    return empty_search_result()
+
+
+def _extract_routing(llm_response: Any) -> tuple[str, str, dict]:
+    top = llm_response if isinstance(llm_response, dict) else {}
+    decision = top["decision"] if isinstance(top.get("decision"), dict) else {}
+    modes = (top.get("mode"), top.get("search_type"), decision.get("selected_strategy"), decision.get("search_type"))
+    reasons = (top.get("reason"), decision.get("reasoning"), decision.get("reason"))
+    raw_mode = next((v.strip().lower() for v in modes if isinstance(v, str) and v.strip()), "")
+    search_type = raw_mode if raw_mode in _ALLOWED_SEARCH_TYPES else "unknown"
+    reason = next((v for v in reasons if isinstance(v, str) and v.strip()), "")
+    raw_params = decision.get("parameters")
+    params = raw_params if isinstance(raw_params, dict) else (top["parameters"] if isinstance(top.get("parameters"), dict) else {})
+    return search_type, reason, params
 
 
 # ---------- Root Endpoint ----------
@@ -142,57 +166,60 @@ async def search(request: SearchRequest):
         request (SearchRequest): Contains question and filters.
     Returns:
         dict: The search results based on the identified search type."""
-    logger.info(f"Search request received: {request.question},{request.filters}")
     try:
-        question = request.question
-        filters = request.filters
-        question = question.strip()
+        question = clean_search_text(request.question).strip()
+    except UnsafeSQLError:
+        raise HTTPException(status_code=400, detail="Invalid search question.") from None
 
+    filters = request.filters
+    logger.info("Search request received (question_len=%d)", len(question))
+    try:
         identify_search_type_obj = IdentifySearchType(question, engine)
         llm_response = identify_search_type_obj.get_search_type()
-        logger.info(f"Search type identified: {llm_response}")
-        search_type = llm_response.get("mode")
-        reason = llm_response.get("reason")
-        decision = llm_response.get("decision")
+        search_type, reason, params = _extract_routing(llm_response)
+        logger.info("Search type identified: mode=%s", search_type)
 
         if search_type == "reject":
             # raise ValueError("Unsupported search")
-            return {"search_type": search_type, "reason": reason, "answer": {"sql_command":"","details":[]}}
+            return {"search_type": search_type, "reason": reason, "answer": empty_search_result()}
         else:
             search_obj = AlloyDbSearchTypes(engine)
-            if search_type.lower() == "nl_to_sql":
-                answer = await search_obj.nltosql_search(question, filters)
+            if search_type == "nl_to_sql":
+                answer = _normalize_answer(await search_obj.nltosql_search(question, filters))
                 if len(answer["details"]) == 0:
                     search_type = "vector"
                 else:
                     return {"search_type": search_type, "reason": reason, "answer": answer}
 
-            if search_type.lower() == "vector":
-                sql_constraints = decision.get("parameters").get("sql_constraints")
+            if search_type == "vector":
+                sql_constraints = params.get("sql_constraints")
                 filtered_search = None if sql_constraints == "None" else sql_constraints
-                semantic_text = decision.get("parameters").get("semantic_text")
+                semantic_text = params.get("semantic_text")
                 answer = await search_obj.vector_search(
                     question, filters, filtered_search, semantic_text
                 )
-                return {"search_type": search_type, "reason": reason, "answer": answer}
-            elif search_type.lower() == "hybrid":
-                sql_constraints = decision.get("parameters").get("sql_constraints")
+                return {"search_type": search_type, "reason": reason, "answer": _normalize_answer(answer)}
+            elif search_type == "hybrid":
+                sql_constraints = params.get("sql_constraints")
                 filtered_search = None if sql_constraints == "None" else sql_constraints
-                semantic_text = decision.get("parameters").get("semantic_text")
+                semantic_text = params.get("semantic_text")
                 answer = await search_obj.hybrid_search(
                     question, filters, filtered_search, semantic_text
                 )
-                return {"search_type": search_type, "reason": reason, "answer": answer}
-            elif search_type.lower() == "ai.if":
-                query_processed = decision.get("sql_query")
-                answer = await search_obj.ai_if_case(query_processed, filters)
-                return {"search_type": search_type, "reason": reason, "answer": answer}
+                return {"search_type": search_type, "reason": reason, "answer": _normalize_answer(answer)}
+            elif search_type == "ai.if":
+                answer = await search_obj.ai_if_case(
+                    question_template=params.get("question_template"),
+                    filters=filters,
+                    filtered_search=params.get("sql_constraints"),
+                )
+                return {"search_type": search_type, "reason": reason, "answer": _normalize_answer(answer)}
             else:
                 # raise ValueError(f"Unsupported search type: {search_type}")
-                return {"search_type": search_type, "reason": reason, "answer": reason}
-    except Exception as e:
-        logger.error(f"Error during search: {e}\n{traceback.format_exc()}")
-        raise HTTPException(status_code=500, detail=str(e))
+                return {"search_type": search_type, "reason": reason, "answer": empty_search_result()}
+    except Exception:
+        logger.exception("Error during search")
+        raise HTTPException(status_code=500, detail=_GENERIC_SEARCH_ERROR) from None
 
 
 # ---------- Run Server ----------
