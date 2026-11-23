@@ -143,7 +143,7 @@ async def search(request: CloudSqlSearchRequest, engine: Engine = Depends(get_en
         return {"search_type": search_type, "reason": reason, "answer": answer}
     except Exception as e:
         logger.error(f"Error during search: {e}\n{traceback.format_exc()}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8080)
